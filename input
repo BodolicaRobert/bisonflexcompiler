@@ -1,5 +1,16 @@
 // main function
 // declarations
+
+class Car {
+private
+    char brand[20];
+    char color;
+public
+    void setColor(char colorType) {
+        color = colorType;
+    }
+};
+
 int i;
 double val = 2.5, res[10];
 // statements
