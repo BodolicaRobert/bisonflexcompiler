@@ -35,7 +35,7 @@
 %type<nr> expr
 %type<str> type class_method function_parameter function_parameters ids
 %%
-start:libraries classes global KEYWORD_TYPE MAIN '{' program '}' {printf("programul este acceptat\n");}
+start:libraries classes global KEYWORD_TYPE MAIN '{' program '}' {printf("The program is accepted\n");}
      ;
 
 libraries:libraries library
@@ -50,12 +50,12 @@ classes:classes class
      |class
      ;
 
-class:KEYWORD_CLASS ID'{'class_declarations class_functions'}'          {AfisareFunctii("metode clasa");}
+class:KEYWORD_CLASS ID'{'class_declarations class_functions'}'          {PrintFunct("Class Methods");}
      |KEYWORD_TYPE ID':'':'ID'('')''{'function_declarations'}'
      |KEYWORD_TYPE ID':'':'ID'('function_parameters')''{'function_declarations'}'
      ;     
 
-class_declarations:class_declarations class_declaration                 {AfisareVariabile("clasa");}
+class_declarations:class_declarations class_declaration                 {PrintVar("Class");}
                   |class_declaration
                   ;
 
@@ -64,15 +64,15 @@ class_declaration:KEYWORD_CLASS_TYPE':'class_dec
 
 class_dec:class_dec dec
          |dec
-         |KEYWORD_TYPE ID ASSIGN NR {declarare_variabila($2, $1, $4, "NU");}
+         |KEYWORD_TYPE ID ASSIGN NR {var_declaring($2, $1, $4, "NU");}
          ;
 
-dec:ID ASSIGN KEYWORD_TYPE                      {declarare_variabila_fara_init($1, $3,"NU");}
-   |ID ASSIGN type                              {declarare_variabila_fara_init($1, $3,"DA");}
-   |ID'['NR']''['NR']' ASSIGN KEYWORD_TYPE      { declarare_variabila_fara_init($1,$9,"NU");}
-   |ID'['NR']' ASSIGN KEYWORD_TYPE              { declarare_variabila_fara_init($1,$6,"NU");}
-   |type ID ASSIGN NR                           {declarare_variabila($2, $1, $4, "DA");}
-   |ID ASSIGN NR                                {identificare_variabila($1);Asignare($1,$3);}
+dec:ID ASSIGN KEYWORD_TYPE                      {var_declaring_without_init($1, $3,"NU");}
+   |ID ASSIGN type                              {var_declaring_without_init($1, $3,"DA");}
+   |ID'['NR']''['NR']' ASSIGN KEYWORD_TYPE      { var_declaring_without_init($1,$9,"NU");}
+   |ID'['NR']' ASSIGN KEYWORD_TYPE              { var_declaring_without_init($1,$6,"NU");}
+   |type ID ASSIGN NR                           {var_declaring($2, $1, $4, "DA");}
+   |ID ASSIGN NR                                {var_verification($1);Assign($1,$3);}
    ; 
 
 type:KEYWORD_CONST KEYWORD_TYPE                 {strcat($1," ");strcat($1,$2);$$=$1;}
@@ -82,30 +82,30 @@ class_functions:class_functions class_function
                 |class_function
                 ;
 
-class_function:KEYWORD_CLASS_TYPE':' KEYWORD_TYPE ID'('function_parameters')''{'function_declarations'}'    {declarare_functie($3,$4,$6);AfisareVariabile("in interiorul unei functii");}
-              |KEYWORD_TYPE ID'('function_parameters')''{'function_declarations'}'                          {declarare_functie($1,$2,$4);AfisareVariabile("in interiorul unei functii");}
-              |KEYWORD_TYPE ID function_parameter                                                           {declarare_functie($1,$2,$3);}
-              |KEYWORD_TYPE ID function_parameter '{'function_declarations'}'                               {declarare_functie($1,$2,$3);AfisareVariabile("in interiorul unei functii");}
-              |KEYWORD_TYPE ID '('function_parameters')'                                                    {declarare_functie($1,$2,$4);}
+class_function:KEYWORD_CLASS_TYPE':' KEYWORD_TYPE ID'('function_parameters')''{'function_declarations'}'    {declaring_function($3,$4,$6);PrintVar("the function");}
+              |KEYWORD_TYPE ID'('function_parameters')''{'function_declarations'}'                          {declaring_function($1,$2,$4);PrintVar("the function");}
+              |KEYWORD_TYPE ID function_parameter                                                           {declaring_function($1,$2,$3);}
+              |KEYWORD_TYPE ID function_parameter '{'function_declarations'}'                               {declaring_function($1,$2,$3);PrintVar("the function");}
+              |KEYWORD_TYPE ID '('function_parameters')'                                                    {declaring_function($1,$2,$4);}
               ; 
 
 function_parameters:function_parameters',' function_parameter       {strcat($3,";");strcat($3,$1);$$=$3;}
                    |function_parameter                              {strcat($1,";");}
                    ;   
 
-function_parameter: ID ASSIGN KEYWORD_TYPE                          {declarare_variabila_fara_init($1,$3,"NU");$$=$3;}
-                  |ID ASSIGN type                                   {declarare_variabila_fara_init($1,$3,"DA");$$=$3;}
-                  |ID'['']' ASSIGN KEYWORD_TYPE                     {declarare_variabila_fara_init($1,$5,"NU"); $$=$5;}      
-                  |ID'['']''['']' ASSIGN KEYWORD_TYPE               {declarare_variabila_fara_init($1,$7,"NU");$$=$7;}
-                  |ID'['NR']' ASSIGN KEYWORD_TYPE                   {declarare_variabila_fara_init($1,$6,"NU");$$=$6;}
-                  |'&' ID ASSIGN KEYWORD_TYPE                       {declarare_variabila_fara_init($2,$4,"NU"); $$=$4;}
-                  |'*' ID ASSIGN KEYWORD_TYPE                       {declarare_variabila_fara_init($2,$4,"NU"); $$=$4;}
+function_parameter: ID ASSIGN KEYWORD_TYPE                          {var_declaring_without_init($1,$3,"NU");$$=$3;}
+                  |ID ASSIGN type                                   {var_declaring_without_init($1,$3,"DA");$$=$3;}
+                  |ID'['']' ASSIGN KEYWORD_TYPE                     {var_declaring_without_init($1,$5,"NU"); $$=$5;}      
+                  |ID'['']''['']' ASSIGN KEYWORD_TYPE               {var_declaring_without_init($1,$7,"NU");$$=$7;}
+                  |ID'['NR']' ASSIGN KEYWORD_TYPE                   {var_declaring_without_init($1,$6,"NU");$$=$6;}
+                  |'&' ID ASSIGN KEYWORD_TYPE                       {var_declaring_without_init($2,$4,"NU"); $$=$4;}
+                  |'*' ID ASSIGN KEYWORD_TYPE                       {var_declaring_without_init($2,$4,"NU"); $$=$4;}
                   |function_call                                     {$$=0;}
                   |'('')'                                           {$$=0;}
                   ;
 
-function_call:ID ASSIGN ID '(' ids ')'                               {identificare_variabila($1); identificare_functie($3,$5);}
-            |ID '(' ids ')'                                        {identificare_functie($1,$3);}
+function_call:ID ASSIGN ID '(' ids ')'                               {var_verification($1); identify_function($3,$5);}
+            |ID '(' ids ')'                                        {identify_function($1,$3);}
             ;
 
 ids:ids','ID                                                  {strcat($3,";");strcat($3,$1);$$=$3;}
@@ -114,7 +114,7 @@ ids:ids','ID                                                  {strcat($3,";");st
     |NR                                                           {$$=strdup("int;");}
     ; 
 
-op:ID                                                               {identificare_variabila($1);}
+op:ID                                                               {var_verification($1);}
   |NR 
   ;   
 
@@ -129,17 +129,17 @@ function_declaration:declaration
 return:KEYWORD_RETURN op
       ;
 
-global:global expression                        {AfisareVariabile("global");}
-      |global global_function                   {AfisareFunctii("global");}
+global:global expression                        {PrintVar("global");}
+      |global global_function                   {PrintFunct("global");}
       |expression 
       |global_function
       ;
 
-global_function:KEYWORD_TYPE ID'('function_parameters')''{'function_declarations'}'       {declarare_functie($1,$2,$4);AfisareVariabile("in interiorul unei functii");}
-               |KEYWORD_TYPE ID function_parameter '{'function_declarations'}'            {declarare_functie($1,$2,$3);AfisareVariabile("in interiorul unei functii");}   
+global_function:KEYWORD_TYPE ID'('function_parameters')''{'function_declarations'}'       {declaring_function($1,$2,$4);PrintVar("the function");}
+               |KEYWORD_TYPE ID function_parameter '{'function_declarations'}'            {declaring_function($1,$2,$3);PrintVar("the function");}   
                ;
 
-program:declarations /*liniile de cod*/             {AfisareVariabile("main");Afisare_expresie();}
+program:declarations /*liniile de cod*/             {PrintVar("main");show_exp();}
        ;
 
 declarations:declarations declaration
@@ -154,7 +154,7 @@ declaration:KEYWORD_IF'('conditions')' '{'instructions'}'
            |printing
            |string_function 
            |expression
-           |EVAL'('expr')'                          {Adaugare_argument($3);}
+           |EVAL'('expr')'                          {add_arg($3);}
            ;
          
 conditions:conditions logic_operator condition
@@ -182,17 +182,17 @@ logic_operator:AND
               |'!'
               ;   
 
-content:KEYWORD_TYPE ID ASSIGN NR';'cond';'ID INC               {declarare_variabila($2,$1,$4,"NU");identificare_variabila($2);}
-        |KEYWORD_TYPE ID ASSIGN NR';'cond';'ID DEC              {declarare_variabila($2,$1,$4,"NU");identificare_variabila($2);}
-        |ID ASSIGN NR ';'cond';'ID DEC                          {identificare_variabila($1);identificare_variabila($7);}
-        |ID ASSIGN NR ';'cond';'ID INC                          {identificare_variabila($1);identificare_variabila($7);}
+content:KEYWORD_TYPE ID ASSIGN NR';'cond';'ID INC               {var_declaring($2,$1,$4,"NU");var_verification($2);}
+        |KEYWORD_TYPE ID ASSIGN NR';'cond';'ID DEC              {var_declaring($2,$1,$4,"NU");var_verification($2);}
+        |ID ASSIGN NR ';'cond';'ID DEC                          {var_verification($1);var_verification($7);}
+        |ID ASSIGN NR ';'cond';'ID INC                          {var_verification($1);var_verification($7);}
         ;
 
-cond:   ID '>''=' expr                              {identificare_variabila($1);Asignare($1,$4 + 1); }
-        |ID '<''=' expr                             {identificare_variabila($1);Asignare($1,$4 + 1);} 
-        |ID '!''=' expr                             {identificare_variabila($1);Asignare($1, $4);} 
-        |ID'<'expr                                  {identificare_variabila($1);Asignare($1,$3);} 
-        |ID'>'expr                                  {identificare_variabila($1);Asignare($1,$3);} 
+cond:   ID '>''=' expr                              {var_verification($1);Asignare($1,$4 + 1); }
+        |ID '<''=' expr                             {var_verification($1);Asignare($1,$4 + 1);} 
+        |ID '!''=' expr                             {var_verification($1);Asignare($1, $4);} 
+        |ID'<'expr                                  {var_verification($1);Asignare($1,$3);} 
+        |ID'>'expr                                  {var_verification($1);Asignare($1,$3);} 
         ;                            
 
 instructions:instructions instruction
@@ -203,26 +203,26 @@ instruction:declaration
             |return 
             ;
 
-string_function:STRLEN'('ID')'                       {identificare_variabila($3);}
-               |STRCPY'('ID','ID')'                  {identificare_variabila($3);identificare_variabila($5);}
-               |STRSTR'('ID','ID')'                  {identificare_variabila($3);identificare_variabila($5);}
-               |STRCMP'('ID','ID')'                  {identificare_variabila($3);identificare_variabila($5);}
-               |STRCHR'('ID','ID')'                  {identificare_variabila($3);identificare_variabila($5);}
-               |STRCAT'('ID','ID')'                  {identificare_variabila($3);identificare_variabila($5);}
+string_function:STRLEN'('ID')'                       {var_verification($3);}
+               |STRCPY'('ID','ID')'                  {var_verification($3);var_verification($5);}
+               |STRSTR'('ID','ID')'                  {var_verification($3);var_verification($5);}
+               |STRCMP'('ID','ID')'                  {var_verification($3);var_verification($5);}
+               |STRCHR'('ID','ID')'                  {var_verification($3);var_verification($5);}
+               |STRCAT'('ID','ID')'                  {var_verification($3);var_verification($5);}
                ;
 
-expression:ID ASSIGN expr                                   {identificare_variabila($1);Asignare($1,$3);}
+expression:ID ASSIGN expr                                   {var_verification($1);Asignare($1,$3);}
         |ID'('array')'  /* apelul pt functii void */
-        |ID DEC                                             {identificare_variabila($1);decrementare($1);}
-        |ID INC                                             {identificare_variabila($1);incrementare($1);}
-        |ID ASSIGN KEYWORD_TYPE                             {declarare_variabila_fara_init($1, $3,"NU");}
-        |ID ASSIGN type                                     {declarare_variabila_fara_init($1, $3, "DA");} 
-        |KEYWORD_TYPE ID ASSIGN NR                          {declarare_variabila($2, $1, $4, "NU");}
-        |ID '['NR']'ASSIGN KEYWORD_TYPE                     {declarare_variabila_fara_init($1,$6,"NU");}
-        |ID '['NR']'ASSIGN'/''/'array'/''/'                {identificare_variabila($1);}
-        |ID '['NR']''['NR']'ASSIGN KEYWORD_TYPE             {declarare_variabila_fara_init($1,$9,"NU");}
+        |ID DEC                                             {var_verification($1);decr($1);}
+        |ID INC                                             {var_verification($1);incr($1);}
+        |ID ASSIGN KEYWORD_TYPE                             {var_declaring_without_init($1, $3,"NU");}
+        |ID ASSIGN type                                     {var_declaring_without_init($1, $3, "DA");} 
+        |KEYWORD_TYPE ID ASSIGN NR                          {var_declaring($2, $1, $4, "NU");}
+        |ID '['NR']'ASSIGN KEYWORD_TYPE                     {var_declaring_without_init($1,$6,"NU");}
+        |ID '['NR']'ASSIGN'/''/'array'/''/'                {var_verification($1);}
+        |ID '['NR']''['NR']'ASSIGN KEYWORD_TYPE             {var_declaring_without_init($1,$9,"NU");}
         |ID '['NR']''['NR']'ASSIGN'/''/'matrix'/''/'
-        |type ID ASSIGN NR                                  {declarare_variabila($2, $1, $4,"DA");}
+        |type ID ASSIGN NR                                  {var_declaring($2, $1, $4,"DA");}
         |ID ID
         |ID'.'ID'('')'
         |ID'.'ID ASSIGN op
@@ -247,7 +247,7 @@ expr:expr'+'expr            {$$ = $1 + $3;}
     |expr':'expr            {$$ = $1 / $3;}
     |'('expr')'             {$$ =$2;}
     |NR                     {$$=$1;}
-    |ID                     {identificare_variabila($1);verificare_initializare($1);$$=returnare_valoare($1);}
+    |ID                     {var_verification($1);initialization_verify($1);$$=return_value($1);}
     |string_function         {$$=0;}
     |ID'['op']'             {$$=0;}
     |ID'['op']''['op']'     {$$=0;}
@@ -272,8 +272,8 @@ elem_reading:elem_reading',' ID
 printing:WRITE elem_printing
       ;
 
-elem_printing:elem_printing',' ID         {identificare_variabila($3);}
-           |ID                          {identificare_variabila($1);}
+elem_printing:elem_printing',' ID         {var_verification($3);}
+           |ID                          {var_verification($1);}
            ;
 %%
 
@@ -282,7 +282,7 @@ int yywrap(void) {
 }
 
 int yyerror(char * s){
-printf("eroare: %s la linia:%d\n",s,yylineno);
+printf("erorr: %s at line:%d\n",s,yylineno);
 }
 
 int main(int argc, char** argv){
@@ -291,10 +291,10 @@ int main(int argc, char** argv){
  FILE* s;
  if(NULL == (s = fopen("symbol_table.txt","w")))
     {
-        perror("Eroare la deschiderea fisierului de prelucrat!\n");
+        perror("Error opening file to process!\n");
         exit(1);
     }
-    else {printf("S-a creat cu succes\n");}
+    else {printf("It was successfully created\n");}
           
  fclose(s);  
    
