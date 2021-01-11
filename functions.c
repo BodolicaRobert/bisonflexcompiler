@@ -1,58 +1,15 @@
 #include "functions.h"
 
-// struct variable
-// {
-//       int value;
-//       char* name;
-//       char* data_type;
-//       char* constant_value;
-//       char* initialization;
-
-// };
-// struct variable var[1000];
-
-// int var_counter=0,new_var_counter=0;
-// int function_counter=0,new_function_counter=0;
-
-
-// struct function 
-// {
-//       char* type;
-//       char* name;
-//       int nr_parametrii;
-//       char * parameters;
- 
-// };
-// struct function funct[1000];
-
-int var_counter=0,new_var_counter=0;
-int function_counter=0,new_function_counter=0;
-struct variable
-{
-      int value;
-      char* data_type;
-      char* name;
-      char* constant_value;
-      char* initialization;
-
-};
-struct variable var[1000];
-
-struct function 
-{
-      char* type;
-      char* name;
-      char * parameters;
- 
-};
-struct function funct[1000];
 
 int is_declared(char* name) // we check if a variable exists or not in the vector of variables
-{for(int i=0;i<var_counter;i++)
-  {if(strcmp(var[i].name,name)==0) 
-       {return i; }
- return -1;
+{
+  for (int i = 0; i < var_counter; i++) {
+    if(strcmp(var[i].name,name)==0) {
+      return i; 
+    }
   }
+  return -1;
+}
 
 void var_declaring(char* name, char* data_type, int value, char* const_var) //we insert variables with initialization into the vector of variables
 {
@@ -72,7 +29,8 @@ void var_declaring(char* name, char* data_type, int value, char* const_var) //we
   }
 }
 
-void var_declaring_without_init(char* name, char* data_type, char* const_var) //we  insert variable w/ initialization 
+void var_declaring_without_init(char* name, char* data_type, char* const_var) //we  insert variable w/ initialization
+{
   if(is_declared(name)==-1)
   { var[var_counter].name=strdup(name);
     var[var_counter].data_type=strdup(data_type);
@@ -264,6 +222,10 @@ void incr(char * name)
 void decr(char * name)
 {
       if(is_declared(name)!=-1)
-      { if(strcmp(var[verify_if_declared(name)].data_type,"int")==0) var[verify_if_declared(name)].value--;
+      { 
+        if(strcmp(var[verify_if_declared(name)].data_type,"int")==0)
+        {
+          var[verify_if_declared(name)].value--;
+        }
       }
 }

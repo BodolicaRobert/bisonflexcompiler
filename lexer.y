@@ -2,7 +2,266 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "functions.h"
+
+extern FILE* yyin;
+extern char* yytext;
+extern int yylineno;
+extern int yylex();
+extern int yyerror(char* syntaxerror);
+
+
+int var_counter=0,new_var_counter=0;
+int function_counter=0,new_function_counter=0;
+struct variable
+{
+      int value;
+      char* data_type;
+      char* name;
+      char* constant_value;
+      char* initialization;
+
+};
+struct variable var[1000];
+
+struct function 
+{
+      char* type;
+      char* name;
+      char * parameters;
+ 
+};
+struct function funct[1000];
+
+
+
+int is_declared(char* name) // we check if a variable exists or not in the vector of variables
+{
+  for (int i = 0; i < var_counter; i++) {
+    if(strcmp(var[i].name,name)==0) {
+      return i; 
+    }
+  }
+  return -1;
+}
+
+void var_declaring(char* name, char* data_type, int value, char* const_var) //we insert variables with initialization into the vector of variables
+{
+   if(is_declared(name)==-1)
+  { var[var_counter].name = strdup(name);
+    var[var_counter].data_type=strdup(data_type);
+    var[var_counter].value=value;
+    var[var_counter].constant_value = strdup(const_var);
+    var[var_counter].initialization="YES";
+    var_counter++;
+  }
+  else
+  {     char message[256];
+        sprintf(message,"variable '%s' is already declared",name);
+        yyerror(message);
+        exit(0);
+  }
+}
+
+void var_declaring_without_init(char* name, char* data_type, char* const_var) //we  insert variable w/ initialization
+{
+  if(is_declared(name)==-1)
+  { var[var_counter].name=strdup(name);
+    var[var_counter].data_type=strdup(data_type);
+    var[var_counter].value=0;
+    var[var_counter].constant_value = strdup(const_var);
+    var[var_counter].initialization="NOPE";
+    var_counter++;
+  }
+     else
+  {     char message[256];
+        sprintf(message,"variable '%s' is already declared",name);
+        yyerror(message);
+        exit(0);
+  }
+}
+
+int verify_if_declared(char* name) // we search if the variable was declared or not and if it was declared we return the position
+{
+   for(int i=0;i<var_counter;i++)
+       {if(strcmp(var[i].name,name)==0) return i;}
+  return -1;                                       
+}
+void var_verification(char* name) // we verify if the variable was declared or not 
+{
+      if(verify_if_declared(name)==-1)
+                 {char message[256];
+                     sprintf(message,"variable '%s' was not declared",name);
+                     yyerror(message);
+                     exit(0);
+                 }       
+}
+
+void initialization_verify(char*name)  // we check if the right side of an expression is initialized
+{
+     for(int i=0;i<var_counter;i++)
+      if(strcmp(var[i].name,name)==0)
+         if(strcmp(var[i].initialization,"NOPE")==0)  
+         {char message[256];
+          sprintf(message,"variable '%s' was not initialized",name);
+          yyerror(message);
+          exit(0);
+         }   
+}
+
+int return_value(char * name)
+{
+      for(int i=0;i<var_counter;i++)
+      if(strcmp(var[i].name,name)==0)
+         if(strcmp(var[i].initialization,"NOPE")!=0 && (strcmp(var[i].data_type,"int")==0 || strcmp(var[i].data_type,"const int")==0)) return var[i].value ;
+           else return 0;  
+}
+
+void Assign(char* name,int value)
+{
+        if(strcmp(var[verify_if_declared(name)].constant_value,"YES")==0)
+        {char message[256];
+          sprintf(message,"The constant variable %s can't be on the left side of an assignment",name);
+          yyerror(message);
+          exit(0);
+        }
+        if(strcmp(var[verify_if_declared(name)].data_type,"int")==0 && value != 0)                                                                            
+        {var[verify_if_declared(name)].value=value;
+        var[verify_if_declared(name)].initialization=strdup("YES");  }
+        else if(strcmp(var[verify_if_declared(name)].data_type,"float")==0 && value != 0)
+          {var[verify_if_declared(name)].initialization=strdup("YES");  }
+        else if(strcmp(var[verify_if_declared(name)].data_type,"double")==0 && value != 0)
+          {var[verify_if_declared(name)].initialization=strdup("YES");  }
+        else if(strcmp(var[verify_if_declared(name)].data_type,"bool")==0 && ( value == 0 || value==1))
+          {var[verify_if_declared(name)].initialization=strdup("YES");}
+        else
+        if(strcmp(var[verify_if_declared(name)].data_type,"char")==0 && value == 0)
+        {var[verify_if_declared(name)].initialization=strdup("YES");  }
+        else 
+        {   char message[256];
+            sprintf(message,"The variable %s can't have another type of variable",name);
+            yyerror(message);
+            exit(0); 
+        }       
+}
+
+
+int already_declared_function(char* name,char * parameters)
+{
+    for(int i=0;i<function_counter;i++)
+    {    if(strcmp(funct[i].name,name)==0)
+                     return i;                                 
+    }  
+    return -1;
+}
+
+void declaring_function(char* type,char* name,char * parameters)
+{    
+      if(already_declared_function(name,type)==-1)
+         {funct[function_counter].type=type;
+          funct[function_counter].name=name;
+          funct[function_counter].parameters=parameters;
+          function_counter++;
+         }
+        else {char message[256];
+              sprintf(message,"Function '%s' was already declared",name);
+              yyerror(message);
+              exit(0);
+              }  
+}
+
+int verifyIF_functionDEFINED(char* name)/// we verify if the the function was defined
+{
+   for(int i=0;i<function_counter;i++)
+       {if(strcmp(funct[i].name,name)==0) return i;    
+       }
+  return -1;                                       
+}
+void identify_function(char* name,char * parameters) // we identify the function when it is called
+{   
+       if(verifyIF_functionDEFINED(name)==-1)
+                 {   char message[256];
+                     sprintf(message,"Function '%s' was not declared",name);
+                     yyerror(message);
+                     exit(0);
+                 }    
+
+
+      char args[1000]="";
+      char *p=malloc(100);
+      p=strtok(parameters,";");
+      while(p!=NULL)
+      {     if(strcmp(p,"int")==0) {strcat(args,"int;");}
+            else    
+               { if(verify_if_declared(p)!=-1) 
+                {strcat(args,var[verify_if_declared(p)].data_type);
+                 strcat(args,";");
+                }
+               }
+            p=strtok(NULL,";");
+      }
+      
+      if(strcmp(funct[verifyIF_functionDEFINED(name)].parameters,args)!=0)
+      {char message[256];
+       sprintf(message,"The parameters of the called function %s do not have the same type as in the definition of the function.",name);
+       yyerror(message);
+       exit(0);}       
+}
+
+void PrintVar( char* type)
+{
+  FILE* s = fopen("symbol_table.txt", "a");
+  fprintf(s,"\n Variable statements In '%s':\n",type);
+  
+  for(int i=new_var_counter;i<var_counter;i++)
+  { fprintf(s,"name: '%s' ,type:'%s' , value: '%d' ,constant '%s' \n",var[i].name,var[i].data_type,var[i].value,var[i].constant_value);  
+  }
+  new_var_counter=var_counter;
+  fclose(s);
+} 
+
+void PrintFunct(char * type)
+{
+  FILE* s=fopen("symbol_table.txt","a");
+  fprintf(s,"\n Functions in '%s':\n",type);
+   
+  for(int j=new_function_counter;j<function_counter;j++)
+  { fprintf(s,"name: '%s' ,type:'%s'  ,parameters: %s \n" ,funct[j].name,funct[j].type,funct[j].parameters);    
+  }
+  new_function_counter=function_counter;
+  fclose(s);
+}
+
+int expression[1000],exprr=0;
+void add_arg(int ex)
+{
+   expression[exprr]=ex;
+   exprr++;
+}
+
+void show_exp()
+{
+      for(int i=0;i<exprr;i++)
+      {  printf("The value of the  expression  with the number %d is :%d\n",i+1,expression[i]);
+      }
+}
+
+void incr(char * name)
+{
+      if(is_declared(name)!=-1)
+      { if(strcmp(var[verify_if_declared(name)].data_type,"int")==0) var[verify_if_declared(name)].value++;
+      }
+}
+
+void decr(char * name)
+{
+      if(is_declared(name)!=-1)
+      { 
+        if(strcmp(var[verify_if_declared(name)].data_type,"int")==0)
+        {
+          var[verify_if_declared(name)].value--;
+        }
+      }
+}
 
 %}
 
@@ -64,14 +323,14 @@ class_declaration:KEYWORD_CLASS_TYPE':'class_dec
 
 class_dec:class_dec dec
          |dec
-         |KEYWORD_TYPE ID ASSIGN NR {var_declaring($2, $1, $4, "NU");}
+         |KEYWORD_TYPE ID ASSIGN NR {var_declaring($2, $1, $4, "NOPE");}
          ;
 
-dec:ID ASSIGN KEYWORD_TYPE                      {var_declaring_without_init($1, $3,"NU");}
-   |ID ASSIGN type                              {var_declaring_without_init($1, $3,"DA");}
-   |ID'['NR']''['NR']' ASSIGN KEYWORD_TYPE      { var_declaring_without_init($1,$9,"NU");}
-   |ID'['NR']' ASSIGN KEYWORD_TYPE              { var_declaring_without_init($1,$6,"NU");}
-   |type ID ASSIGN NR                           {var_declaring($2, $1, $4, "DA");}
+dec:ID ASSIGN KEYWORD_TYPE                      {var_declaring_without_init($1, $3,"NOPE");}
+   |ID ASSIGN type                              {var_declaring_without_init($1, $3,"YES");}
+   |ID'['NR']''['NR']' ASSIGN KEYWORD_TYPE      { var_declaring_without_init($1,$9,"NOPE");}
+   |ID'['NR']' ASSIGN KEYWORD_TYPE              { var_declaring_without_init($1,$6,"NOPE");}
+   |type ID ASSIGN NR                           {var_declaring($2, $1, $4, "YES");}
    |ID ASSIGN NR                                {var_verification($1);Assign($1,$3);}
    ; 
 
@@ -93,13 +352,13 @@ function_parameters:function_parameters',' function_parameter       {strcat($3,"
                    |function_parameter                              {strcat($1,";");}
                    ;   
 
-function_parameter: ID ASSIGN KEYWORD_TYPE                          {var_declaring_without_init($1,$3,"NU");$$=$3;}
-                  |ID ASSIGN type                                   {var_declaring_without_init($1,$3,"DA");$$=$3;}
-                  |ID'['']' ASSIGN KEYWORD_TYPE                     {var_declaring_without_init($1,$5,"NU"); $$=$5;}      
-                  |ID'['']''['']' ASSIGN KEYWORD_TYPE               {var_declaring_without_init($1,$7,"NU");$$=$7;}
-                  |ID'['NR']' ASSIGN KEYWORD_TYPE                   {var_declaring_without_init($1,$6,"NU");$$=$6;}
-                  |'&' ID ASSIGN KEYWORD_TYPE                       {var_declaring_without_init($2,$4,"NU"); $$=$4;}
-                  |'*' ID ASSIGN KEYWORD_TYPE                       {var_declaring_without_init($2,$4,"NU"); $$=$4;}
+function_parameter: ID ASSIGN KEYWORD_TYPE                          {var_declaring_without_init($1,$3,"NOPE");$$=$3;}
+                  |ID ASSIGN type                                   {var_declaring_without_init($1,$3,"YES");$$=$3;}
+                  |ID'['']' ASSIGN KEYWORD_TYPE                     {var_declaring_without_init($1,$5,"NOPE"); $$=$5;}      
+                  |ID'['']''['']' ASSIGN KEYWORD_TYPE               {var_declaring_without_init($1,$7,"NOPE");$$=$7;}
+                  |ID'['NR']' ASSIGN KEYWORD_TYPE                   {var_declaring_without_init($1,$6,"NOPE");$$=$6;}
+                  |'&' ID ASSIGN KEYWORD_TYPE                       {var_declaring_without_init($2,$4,"NOPE"); $$=$4;}
+                  |'*' ID ASSIGN KEYWORD_TYPE                       {var_declaring_without_init($2,$4,"NOPE"); $$=$4;}
                   |function_call                                     {$$=0;}
                   |'('')'                                           {$$=0;}
                   ;
@@ -182,17 +441,17 @@ logic_operator:AND
               |'!'
               ;   
 
-content:KEYWORD_TYPE ID ASSIGN NR';'cond';'ID INC               {var_declaring($2,$1,$4,"NU");var_verification($2);}
-        |KEYWORD_TYPE ID ASSIGN NR';'cond';'ID DEC              {var_declaring($2,$1,$4,"NU");var_verification($2);}
+content:KEYWORD_TYPE ID ASSIGN NR';'cond';'ID INC               {var_declaring($2,$1,$4,"NOPE");var_verification($2);}
+        |KEYWORD_TYPE ID ASSIGN NR';'cond';'ID DEC              {var_declaring($2,$1,$4,"NOPE");var_verification($2);}
         |ID ASSIGN NR ';'cond';'ID DEC                          {var_verification($1);var_verification($7);}
         |ID ASSIGN NR ';'cond';'ID INC                          {var_verification($1);var_verification($7);}
         ;
 
-cond:   ID '>''=' expr                              {var_verification($1);Asignare($1,$4 + 1); }
-        |ID '<''=' expr                             {var_verification($1);Asignare($1,$4 + 1);} 
-        |ID '!''=' expr                             {var_verification($1);Asignare($1, $4);} 
-        |ID'<'expr                                  {var_verification($1);Asignare($1,$3);} 
-        |ID'>'expr                                  {var_verification($1);Asignare($1,$3);} 
+cond:   ID '>''=' expr                              {var_verification($1);Assign($1,$4 + 1); }
+        |ID '<''=' expr                             {var_verification($1);Assign($1,$4 + 1);} 
+        |ID '!''=' expr                             {var_verification($1);Assign($1, $4);} 
+        |ID'<'expr                                  {var_verification($1);Assign($1,$3);} 
+        |ID'>'expr                                  {var_verification($1);Assign($1,$3);} 
         ;                            
 
 instructions:instructions instruction
@@ -211,18 +470,18 @@ string_function:STRLEN'('ID')'                       {var_verification($3);}
                |STRCAT'('ID','ID')'                  {var_verification($3);var_verification($5);}
                ;
 
-expression:ID ASSIGN expr                                   {var_verification($1);Asignare($1,$3);}
+expression:ID ASSIGN expr                                   {var_verification($1);Assign($1,$3);}
         |ID'('array')'  /* apelul pt functii void */
         |ID DEC                                             {var_verification($1);decr($1);}
         |ID INC                                             {var_verification($1);incr($1);}
-        |ID ASSIGN KEYWORD_TYPE                             {var_declaring_without_init($1, $3,"NU");}
-        |ID ASSIGN type                                     {var_declaring_without_init($1, $3, "DA");} 
-        |KEYWORD_TYPE ID ASSIGN NR                          {var_declaring($2, $1, $4, "NU");}
-        |ID '['NR']'ASSIGN KEYWORD_TYPE                     {var_declaring_without_init($1,$6,"NU");}
-        |ID '['NR']'ASSIGN'/''/'array'/''/'                {var_verification($1);}
-        |ID '['NR']''['NR']'ASSIGN KEYWORD_TYPE             {var_declaring_without_init($1,$9,"NU");}
+        |ID ASSIGN KEYWORD_TYPE                             {var_declaring_without_init($1, $3,"NOPE");}
+        |ID ASSIGN type                                     {var_declaring_without_init($1, $3, "YES");} 
+        |KEYWORD_TYPE ID ASSIGN NR                          {var_declaring($2, $1, $4, "NOPE");}
+        |ID '['NR']'ASSIGN KEYWORD_TYPE                     {var_declaring_without_init($1,$6,"NOPE");}
+        |ID '['NR']'ASSIGN'/''/'array'/''/'                 {var_verification($1);}
+        |ID '['NR']''['NR']'ASSIGN KEYWORD_TYPE             {var_declaring_without_init($1,$9,"NOPE");}
         |ID '['NR']''['NR']'ASSIGN'/''/'matrix'/''/'
-        |type ID ASSIGN NR                                  {var_declaring($2, $1, $4,"DA");}
+        |type ID ASSIGN NR                                  {var_declaring($2, $1, $4,"YES");}
         |ID ID
         |ID'.'ID'('')'
         |ID'.'ID ASSIGN op

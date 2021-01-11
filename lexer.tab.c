@@ -79,338 +79,262 @@ extern int yylineno;
 extern int yylex();
 extern int yyerror(char* syntaxerror);
 
-struct variabila
+
+int var_counter=0,new_var_counter=0;
+int function_counter=0,new_function_counter=0;
+struct variable
 {
-      int valoare;
-      char* nume;
-      char* tip_data;
-      char* constanta;
-      char* initializare;
+      int value;
+      char* data_type;
+      char* name;
+      char* constant_value;
+      char* initialization;
 
 };
-struct variabila var[1000];
+struct variable var[1000];
 
-int contor_variabila=0,contor_variabila_nou=0;
-int contor_functie=0,contor_functie_nou=0;
-
-
-struct functie 
+struct function 
 {
-      char* tip;
-      char* nume;
-      int nr_parametrii;
-      char * parametrii;
+      char* type;
+      char* name;
+      char * parameters;
  
 };
-struct functie fnct[1000];
+struct function funct[1000];
 
 
-int deja_declarat(char* nume) // verificam daca o variabila exista sau nu in vectorul de variabile
+
+int is_declared(char* name) // we check if a variable exists or not in the vector of variables
 {
-  for(int i=0;i<contor_variabila;i++)
-  {
-    if(strcmp(var[i].nume,nume)==0) 
-       {
-             return i; 
-       }
+  for (int i = 0; i < var_counter; i++) {
+    if(strcmp(var[i].name,name)==0) {
+      return i; 
+    }
   }
-
   return -1;
-  
 }
 
-
-void declarare_variabila(char* nume, char* tip_data, int valoare, char* const_var) //insereaza variabile cu initializare in vectorul de variabile
+void var_declaring(char* name, char* data_type, int value, char* const_var) //we insert variables with initialization into the vector of variables
 {
-   if(deja_declarat(nume)==-1)
-  {
-    var[contor_variabila].nume = strdup(nume);
-    var[contor_variabila].tip_data=strdup(tip_data);
-    var[contor_variabila].valoare=valoare;
-    var[contor_variabila].constanta = strdup(const_var);
-    var[contor_variabila].initializare="DA";
-    contor_variabila++;
+   if(is_declared(name)==-1)
+  { var[var_counter].name = strdup(name);
+    var[var_counter].data_type=strdup(data_type);
+    var[var_counter].value=value;
+    var[var_counter].constant_value = strdup(const_var);
+    var[var_counter].initialization="YES";
+    var_counter++;
   }
   else
-  {     
-        char mesaj[256];
-        sprintf(mesaj,"Variabila '%s' este deja declarata",nume);
-        yyerror(mesaj);
+  {     char message[256];
+        sprintf(message,"variable '%s' is already declared",name);
+        yyerror(message);
         exit(0);
   }
 }
 
-void declarare_variabila_fara_init(char* nume, char* tip_data, char* const_var) // inserare variabila dar fara initializare
+void var_declaring_without_init(char* name, char* data_type, char* const_var) //we  insert variable w/ initialization
 {
-  if(deja_declarat(nume)==-1)
-  {
-    var[contor_variabila].nume=strdup(nume);
-    var[contor_variabila].tip_data=strdup(tip_data);
-    var[contor_variabila].valoare=0;
-    var[contor_variabila].constanta = strdup(const_var);
-    var[contor_variabila].initializare="NU";
-    contor_variabila++;
-
+  if(is_declared(name)==-1)
+  { var[var_counter].name=strdup(name);
+    var[var_counter].data_type=strdup(data_type);
+    var[var_counter].value=0;
+    var[var_counter].constant_value = strdup(const_var);
+    var[var_counter].initialization="NOPE";
+    var_counter++;
   }
      else
-  {
-        char mesaj[256];
-        sprintf(mesaj,"Variabila '%s' este deja declarata",nume);
-        yyerror(mesaj);
+  {     char message[256];
+        sprintf(message,"variable '%s' is already declared",name);
+        yyerror(message);
         exit(0);
   }
-
 }
 
-int identificare_variabila_verificare(char* nume) // cauta daca variabila a fost declarata sau nu -> returneaza pozitia
+int verify_if_declared(char* name) // we search if the variable was declared or not and if it was declared we return the position
 {
-   for(int i=0;i<contor_variabila;i++)
-       {
-       if(strcmp(var[i].nume,nume)==0) return i;
-
-       }
+   for(int i=0;i<var_counter;i++)
+       {if(strcmp(var[i].name,name)==0) return i;}
   return -1;                                       
 }
-void identificare_variabila(char* nume) // verifica daca a fost declarata sau nu
+void var_verification(char* name) // we verify if the variable was declared or not 
 {
-
-      if(identificare_variabila_verificare(nume)==-1)
-                 {char mesaj[256];
-                     sprintf(mesaj,"Variabila '%s' nu a fost declarata",nume);
-                     yyerror(mesaj);
+      if(verify_if_declared(name)==-1)
+                 {char message[256];
+                     sprintf(message,"variable '%s' was not declared",name);
+                     yyerror(message);
                      exit(0);
-
-                 } 
-
-       
+                 }       
 }
 
-void verificare_initializare(char*nume)  // verifica daca partea dr a unei expresii este initializata
+void initialization_verify(char*name)  // we check if the right side of an expression is initialized
 {
-     for(int i=0;i<contor_variabila;i++)
-      if(strcmp(var[i].nume,nume)==0)
-         if(strcmp(var[i].initializare,"NU")==0)  {char mesaj[256];
-                                                   sprintf(mesaj,"Variabila '%s' nu a fost initializata",nume);
-                                                   yyerror(mesaj);
-                                                   exit(0);
-
-                                                    }   
-
+     for(int i=0;i<var_counter;i++)
+      if(strcmp(var[i].name,name)==0)
+         if(strcmp(var[i].initialization,"NOPE")==0)  
+         {char message[256];
+          sprintf(message,"variable '%s' was not initialized",name);
+          yyerror(message);
+          exit(0);
+         }   
 }
 
-int returnare_valoare(char * nume)
+int return_value(char * name)
 {
-      for(int i=0;i<contor_variabila;i++)
-      if(strcmp(var[i].nume,nume)==0)
-         if(strcmp(var[i].initializare,"NU")!=0 && (strcmp(var[i].tip_data,"int")==0 || strcmp(var[i].tip_data,"const int")==0)) return var[i].valoare ;
+      for(int i=0;i<var_counter;i++)
+      if(strcmp(var[i].name,name)==0)
+         if(strcmp(var[i].initialization,"NOPE")!=0 && (strcmp(var[i].data_type,"int")==0 || strcmp(var[i].data_type,"const int")==0)) return var[i].value ;
            else return 0;  
-
 }
 
-void Asignare(char* nume,int valoare)
+void Assign(char* name,int value)
 {
-        if(strcmp(var[identificare_variabila_verificare(nume)].constanta,"DA")==0){char mesaj[256];
-                                                                                   sprintf(mesaj,"Variabila constanta %s nu poate sta in partea stanga a unei atribuiri.",nume);
-                                                                                   yyerror(mesaj);
-                                                                                   exit(0);}
-
-        if(strcmp(var[identificare_variabila_verificare(nume)].tip_data,"int")==0 && valoare != 0)                                                                            
-        {var[identificare_variabila_verificare(nume)].valoare=valoare;
-        var[identificare_variabila_verificare(nume)].initializare=strdup("DA");  
+        if(strcmp(var[verify_if_declared(name)].constant_value,"YES")==0)
+        {char message[256];
+          sprintf(message,"The constant variable %s can't be on the left side of an assignment",name);
+          yyerror(message);
+          exit(0);
         }
+        if(strcmp(var[verify_if_declared(name)].data_type,"int")==0 && value != 0)                                                                            
+        {var[verify_if_declared(name)].value=value;
+        var[verify_if_declared(name)].initialization=strdup("YES");  }
+        else if(strcmp(var[verify_if_declared(name)].data_type,"float")==0 && value != 0)
+          {var[verify_if_declared(name)].initialization=strdup("YES");  }
+        else if(strcmp(var[verify_if_declared(name)].data_type,"double")==0 && value != 0)
+          {var[verify_if_declared(name)].initialization=strdup("YES");  }
+        else if(strcmp(var[verify_if_declared(name)].data_type,"bool")==0 && ( value == 0 || value==1))
+          {var[verify_if_declared(name)].initialization=strdup("YES");}
         else
-        if(strcmp(var[identificare_variabila_verificare(nume)].tip_data,"float")==0 && valoare != 0)
-          {var[identificare_variabila_verificare(nume)].initializare=strdup("DA");  }
-        else
-        if(strcmp(var[identificare_variabila_verificare(nume)].tip_data,"double")==0 && valoare != 0)
-          {var[identificare_variabila_verificare(nume)].initializare=strdup("DA");  }
-        else
-        if(strcmp(var[identificare_variabila_verificare(nume)].tip_data,"bool")==0 && ( valoare == 0 || valoare==1))
-          {var[identificare_variabila_verificare(nume)].initializare=strdup("DA");
-          }
-        else
-        if(strcmp(var[identificare_variabila_verificare(nume)].tip_data,"char")==0 && valoare == 0)
-        {var[identificare_variabila_verificare(nume)].initializare=strdup("DA");  }
+        if(strcmp(var[verify_if_declared(name)].data_type,"char")==0 && value == 0)
+        {var[verify_if_declared(name)].initialization=strdup("YES");  }
         else 
-        {
-            char mesaj[256];
-            sprintf(mesaj,"Variabilei %s nu i se poate atribui o variabila/valoare de alt tip.",nume);
-            yyerror(mesaj);
-            exit(0);
-        
-        }
-       
+        {   char message[256];
+            sprintf(message,"The variable %s can't have another type of variable",name);
+            yyerror(message);
+            exit(0); 
+        }       
 }
 
-/*
 
-void Verificare_asignare(char *nume_variabila)
+int already_declared_function(char* name,char * parameters)
 {
-
-   char *tip;
-   strcpy(tip,var[identificare_variabila_verificare(nume_variabila)].tip_data); //tipul variabilei din partea stanga
-
-    
-    char *p=malloc(100);
-    p=strtok(argumente_asignate,"+-:*");
-    int ok=1;  
-      while(p!=NULL)
-      {     
-            char* tip_argument;
-            strcpy(tip_argument,var[identificare_variabila_verificare(p)].tip_data);
-
-            if(strcmp(tip,tip_argument)!=0) ok=-1;
-
-            p=strtok(NULL,"+-:*");
-      }
-
-
-    if(ok==-1){char mesaj[256];
-              sprintf(mesaj,"Partea dreapta a atribuirii nu are acelasi tip cu variabila %s din partea stanga.",nume_variabila);
-              yyerror(mesaj);
-              exit(0);
-
-              }
-
-}
-*/
-int deja_declarat_functie(char* nume,char * parametrii)
-{
-    for(int i=0;i<contor_functie;i++)
-    {    
-          if(strcmp(fnct[i].nume,nume)==0)
+    for(int i=0;i<function_counter;i++)
+    {    if(strcmp(funct[i].name,name)==0)
                      return i;                                 
     }  
     return -1;
 }
 
-
-void declarare_functie(char* tip,char* nume,char * parametrii)
+void declaring_function(char* type,char* name,char * parameters)
 {    
-      if(deja_declarat_functie(nume,tip)==-1)
-         {fnct[contor_functie].tip=tip;
-          fnct[contor_functie].nume=nume;
-          fnct[contor_functie].parametrii=parametrii;
-          contor_functie++;
-      
+      if(already_declared_function(name,type)==-1)
+         {funct[function_counter].type=type;
+          funct[function_counter].name=name;
+          funct[function_counter].parameters=parameters;
+          function_counter++;
          }
-        else {char mesaj[256];
-              sprintf(mesaj,"Functia '%s' a fost deja declarata",nume);
-              yyerror(mesaj);
+        else {char message[256];
+              sprintf(message,"Function '%s' was already declared",name);
+              yyerror(message);
               exit(0);
-
               }  
 }
 
-int identificare_functie_verificare(char* nume)
+int verifyIF_functionDEFINED(char* name)/// we verify if the the function was defined
 {
-   for(int i=0;i<contor_functie;i++)
-       {
-       if(strcmp(fnct[i].nume,nume)==0) return i;
-       
+   for(int i=0;i<function_counter;i++)
+       {if(strcmp(funct[i].name,name)==0) return i;    
        }
   return -1;                                       
 }
-void identificare_functie(char* nume,char * parametrii) // pt apelurile de functie
+void identify_function(char* name,char * parameters) // we identify the function when it is called
 {   
-      
-       if(identificare_functie_verificare(nume)==-1)
-                 {char mesaj[256];
-                     sprintf(mesaj,"Functia '%s' nu a fost declarata",nume);
-                     yyerror(mesaj);
+       if(verifyIF_functionDEFINED(name)==-1)
+                 {   char message[256];
+                     sprintf(message,"Function '%s' was not declared",name);
+                     yyerror(message);
                      exit(0);
-
                  }    
 
 
-      char argumente[1000]="";
+      char args[1000]="";
       char *p=malloc(100);
-      p=strtok(parametrii,";");
-      
+      p=strtok(parameters,";");
       while(p!=NULL)
-      {     
-            if(strcmp(p,"int")==0) {strcat(argumente,"int;");}
+      {     if(strcmp(p,"int")==0) {strcat(args,"int;");}
             else    
-               {if(identificare_variabila_verificare(p)!=-1) {strcat(argumente,var[identificare_variabila_verificare(p)].tip_data);
-                                                             strcat(argumente,";");
-                                                            }
+               { if(verify_if_declared(p)!=-1) 
+                {strcat(args,var[verify_if_declared(p)].data_type);
+                 strcat(args,";");
+                }
                }
-
             p=strtok(NULL,";");
       }
       
-      if(strcmp(fnct[identificare_functie_verificare(nume)].parametrii,argumente)!=0){char mesaj[256];
-                                                                                      sprintf(mesaj,"Parametrii apelului functiei %s nu au acelasi tip ca in definitia functiei.",nume);
-                                                                                      yyerror(mesaj);
-                                                                                      exit(0);}       
+      if(strcmp(funct[verifyIF_functionDEFINED(name)].parameters,args)!=0)
+      {char message[256];
+       sprintf(message,"The parameters of the called function %s do not have the same type as in the definition of the function.",name);
+       yyerror(message);
+       exit(0);}       
 }
 
-void AfisareVariabile( char* tip)
+void PrintVar( char* type)
 {
   FILE* s = fopen("symbol_table.txt", "a");
-
-  fprintf(s,"\n In '%s' se pot regasi urmatoarele declaratii de variabile:\n",tip);
+  fprintf(s,"\n Variable statements In '%s':\n",type);
   
- 
-  for(int i=contor_variabila_nou;i<contor_variabila;i++)
-  {
-      fprintf(s,"NUME: '%s' ,TIP:'%s' , VALOARE: '%d' ,CONSTANTA: '%s' \n",var[i].nume,var[i].tip_data,var[i].valoare,var[i].constanta);
-      
+  for(int i=new_var_counter;i<var_counter;i++)
+  { fprintf(s,"name: '%s' ,type:'%s' , value: '%d' ,constant '%s' \n",var[i].name,var[i].data_type,var[i].value,var[i].constant_value);  
   }
-  contor_variabila_nou=contor_variabila;
+  new_var_counter=var_counter;
   fclose(s);
 } 
 
-void AfisareFunctii(char * tip)
+void PrintFunct(char * type)
 {
   FILE* s=fopen("symbol_table.txt","a");
-
-  fprintf(s,"\n In '%s' se pot regasi urmatoarele functii:\n",tip);
+  fprintf(s,"\n Functions in '%s':\n",type);
    
-  for(int j=contor_functie_nou;j<contor_functie;j++)
-  {
-      fprintf(s,"NUME: '%s' ,TIP:'%s'  ,Parametrii: %s \n" ,fnct[j].nume,fnct[j].tip,fnct[j].parametrii);
-       
+  for(int j=new_function_counter;j<function_counter;j++)
+  { fprintf(s,"name: '%s' ,type:'%s'  ,parameters: %s \n" ,funct[j].name,funct[j].type,funct[j].parameters);    
   }
-  
-  contor_functie_nou=contor_functie;
+  new_function_counter=function_counter;
   fclose(s);
-
 }
 
-int expresie[1000],expr=0;
-void Adaugare_argument(int ex)
+int expression[1000],exprr=0;
+void add_arg(int ex)
 {
-   expresie[expr]=ex;
-   expr++;
+   expression[exprr]=ex;
+   exprr++;
 }
 
-void Afisare_expresie()
+void show_exp()
 {
-      for(int i=0;i<expr;i++)
-      {
-            printf("Valoarea expresiei cu numarul %d este :%d\n",i+1,expresie[i]);
+      for(int i=0;i<exprr;i++)
+      {  printf("The value of the  expression  with the number %d is :%d\n",i+1,expression[i]);
       }
 }
 
-void incrementare(char * nume)
+void incr(char * name)
 {
-      if(deja_declarat(nume)!=-1)
-      {
-            if(strcmp(var[identificare_variabila_verificare(nume)].tip_data,"int")==0) var[identificare_variabila_verificare(nume)].valoare++;
+      if(is_declared(name)!=-1)
+      { if(strcmp(var[verify_if_declared(name)].data_type,"int")==0) var[verify_if_declared(name)].value++;
       }
 }
 
-void decrementare(char * nume)
+void decr(char * name)
 {
-      if(deja_declarat(nume)!=-1)
-      {
-            if(strcmp(var[identificare_variabila_verificare(nume)].tip_data,"int")==0) var[identificare_variabila_verificare(nume)].valoare--;
+      if(is_declared(name)!=-1)
+      { 
+        if(strcmp(var[verify_if_declared(name)].data_type,"int")==0)
+        {
+          var[verify_if_declared(name)].value--;
+        }
       }
 }
 
 
-#line 414 "lexer.tab.c"
+#line 338 "lexer.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -433,7 +357,81 @@ void decrementare(char * nume)
 #  endif
 # endif
 
-#include "lexer.tab.h"
+
+/* Debug traces.  */
+#ifndef YYDEBUG
+# define YYDEBUG 0
+#endif
+#if YYDEBUG
+extern int yydebug;
+#endif
+
+/* Token kinds.  */
+#ifndef YYTOKENTYPE
+# define YYTOKENTYPE
+  enum yytokentype
+  {
+    YYEMPTY = -2,
+    YYEOF = 0,                     /* "end of file"  */
+    YYerror = 256,                 /* error  */
+    YYUNDEF = 257,                 /* "invalid token"  */
+    KEYWORD_IF = 258,              /* KEYWORD_IF  */
+    KEYWORD_WHILE = 259,           /* KEYWORD_WHILE  */
+    KEYWORD_ELSE = 260,            /* KEYWORD_ELSE  */
+    KEYWORD_FOR = 261,             /* KEYWORD_FOR  */
+    AND = 262,                     /* AND  */
+    OR = 263,                      /* OR  */
+    ASSIGN = 264,                  /* ASSIGN  */
+    KEYWORD_CLASS = 265,           /* KEYWORD_CLASS  */
+    MAIN = 266,                    /* MAIN  */
+    GHI = 267,                     /* GHI  */
+    LIBRARY = 268,                 /* LIBRARY  */
+    EQUAL = 269,                   /* EQUAL  */
+    KEYWORD_INCLUDE = 270,         /* KEYWORD_INCLUDE  */
+    KEYWORD_RETURN = 271,          /* KEYWORD_RETURN  */
+    READ = 272,                    /* READ  */
+    WRITE = 273,                   /* WRITE  */
+    NR = 274,                      /* NR  */
+    ID = 275,                      /* ID  */
+    KEYWORD_TYPE = 276,            /* KEYWORD_TYPE  */
+    KEYWORD_CLASS_TYPE = 277,      /* KEYWORD_CLASS_TYPE  */
+    KEYWORD_CONST = 278,           /* KEYWORD_CONST  */
+    INC = 279,                     /* INC  */
+    DEC = 280,                     /* DEC  */
+    STRCAT = 281,                  /* STRCAT  */
+    STRSTR = 282,                  /* STRSTR  */
+    STRCHR = 283,                  /* STRCHR  */
+    STRCMP = 284,                  /* STRCMP  */
+    STRLEN = 285,                  /* STRLEN  */
+    STRCPY = 286,                  /* STRCPY  */
+    EVAL = 287                     /* EVAL  */
+  };
+  typedef enum yytokentype yytoken_kind_t;
+#endif
+
+/* Value type.  */
+#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
+union YYSTYPE
+{
+#line 287 "lexer.y"
+
+      int nr;
+      char* str;
+
+#line 422 "lexer.tab.c"
+
+};
+typedef union YYSTYPE YYSTYPE;
+# define YYSTYPE_IS_TRIVIAL 1
+# define YYSTYPE_IS_DECLARED 1
+#endif
+
+
+extern YYSTYPE yylval;
+
+int yyparse (void);
+
+
 /* Symbol kind.  */
 enum yysymbol_kind_t
 {
@@ -883,22 +881,22 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   373,   373,   376,   377,   380,   381,   384,   385,   388,
-     389,   390,   393,   394,   397,   400,   401,   402,   405,   406,
-     407,   408,   409,   410,   413,   416,   417,   420,   421,   422,
-     423,   424,   427,   428,   431,   432,   433,   434,   435,   436,
-     437,   438,   439,   442,   443,   446,   447,   448,   449,   452,
-     453,   456,   457,   460,   461,   464,   467,   468,   469,   470,
-     473,   474,   477,   480,   481,   484,   485,   486,   487,   488,
-     489,   490,   491,   492,   495,   496,   497,   498,   499,   500,
-     503,   504,   507,   508,   509,   510,   511,   512,   515,   516,
-     517,   520,   521,   522,   523,   526,   527,   528,   529,   530,
-     533,   534,   537,   538,   541,   542,   543,   544,   545,   546,
-     549,   550,   551,   552,   553,   554,   555,   556,   557,   558,
-     559,   560,   561,   562,   563,   567,   568,   571,   572,   575,
-     576,   579,   580,   581,   582,   583,   584,   585,   586,   587,
-     588,   589,   590,   591,   592,   593,   594,   595,   596,   597,
-     600,   603,   604,   607,   610,   611
+       0,   297,   297,   300,   301,   304,   305,   308,   309,   312,
+     313,   314,   317,   318,   321,   324,   325,   326,   329,   330,
+     331,   332,   333,   334,   337,   340,   341,   344,   345,   346,
+     347,   348,   351,   352,   355,   356,   357,   358,   359,   360,
+     361,   362,   363,   366,   367,   370,   371,   372,   373,   376,
+     377,   380,   381,   384,   385,   388,   391,   392,   393,   394,
+     397,   398,   401,   404,   405,   408,   409,   410,   411,   412,
+     413,   414,   415,   416,   419,   420,   421,   422,   423,   424,
+     427,   428,   431,   432,   433,   434,   435,   436,   439,   440,
+     441,   444,   445,   446,   447,   450,   451,   452,   453,   454,
+     457,   458,   461,   462,   465,   466,   467,   468,   469,   470,
+     473,   474,   475,   476,   477,   478,   479,   480,   481,   482,
+     483,   484,   485,   486,   487,   491,   492,   495,   496,   499,
+     500,   503,   504,   505,   506,   507,   508,   509,   510,   511,
+     512,   513,   514,   515,   516,   517,   518,   519,   520,   521,
+     524,   527,   528,   531,   534,   535
 };
 #endif
 
@@ -2360,523 +2358,523 @@ yyreduce:
     switch (yyn)
       {
   case 2: /* start: libraries classes global KEYWORD_TYPE MAIN '{' program '}'  */
-#line 373 "lexer.y"
-                                                                 {printf("programul este acceptat\n");}
-#line 2366 "lexer.tab.c"
+#line 297 "lexer.y"
+                                                                 {printf("The program is accepted\n");}
+#line 2364 "lexer.tab.c"
     break;
 
   case 9: /* class: KEYWORD_CLASS ID '{' class_declarations class_functions '}'  */
-#line 388 "lexer.y"
-                                                                        {AfisareFunctii("metode clasa");}
-#line 2372 "lexer.tab.c"
+#line 312 "lexer.y"
+                                                                        {PrintFunct("Class Methods");}
+#line 2370 "lexer.tab.c"
     break;
 
   case 12: /* class_declarations: class_declarations class_declaration  */
-#line 393 "lexer.y"
-                                                                        {AfisareVariabile("clasa");}
-#line 2378 "lexer.tab.c"
+#line 317 "lexer.y"
+                                                                        {PrintVar("Class");}
+#line 2376 "lexer.tab.c"
     break;
 
   case 17: /* class_dec: KEYWORD_TYPE ID ASSIGN NR  */
-#line 402 "lexer.y"
-                                    {declarare_variabila((yyvsp[-2].str), (yyvsp[-3].str), (yyvsp[0].nr), "NU");}
-#line 2384 "lexer.tab.c"
+#line 326 "lexer.y"
+                                    {var_declaring((yyvsp[-2].str), (yyvsp[-3].str), (yyvsp[0].nr), "NOPE");}
+#line 2382 "lexer.tab.c"
     break;
 
   case 18: /* dec: ID ASSIGN KEYWORD_TYPE  */
-#line 405 "lexer.y"
-                                                {declarare_variabila_fara_init((yyvsp[-2].str), (yyvsp[0].str),"NU");}
-#line 2390 "lexer.tab.c"
+#line 329 "lexer.y"
+                                                {var_declaring_without_init((yyvsp[-2].str), (yyvsp[0].str),"NOPE");}
+#line 2388 "lexer.tab.c"
     break;
 
   case 19: /* dec: ID ASSIGN type  */
-#line 406 "lexer.y"
-                                                {declarare_variabila_fara_init((yyvsp[-2].str), (yyvsp[0].str),"DA");}
-#line 2396 "lexer.tab.c"
+#line 330 "lexer.y"
+                                                {var_declaring_without_init((yyvsp[-2].str), (yyvsp[0].str),"YES");}
+#line 2394 "lexer.tab.c"
     break;
 
   case 20: /* dec: ID '[' NR ']' '[' NR ']' ASSIGN KEYWORD_TYPE  */
-#line 407 "lexer.y"
-                                                { declarare_variabila_fara_init((yyvsp[-8].str),(yyvsp[0].str),"NU");}
-#line 2402 "lexer.tab.c"
+#line 331 "lexer.y"
+                                                { var_declaring_without_init((yyvsp[-8].str),(yyvsp[0].str),"NOPE");}
+#line 2400 "lexer.tab.c"
     break;
 
   case 21: /* dec: ID '[' NR ']' ASSIGN KEYWORD_TYPE  */
-#line 408 "lexer.y"
-                                                { declarare_variabila_fara_init((yyvsp[-5].str),(yyvsp[0].str),"NU");}
-#line 2408 "lexer.tab.c"
+#line 332 "lexer.y"
+                                                { var_declaring_without_init((yyvsp[-5].str),(yyvsp[0].str),"NOPE");}
+#line 2406 "lexer.tab.c"
     break;
 
   case 22: /* dec: type ID ASSIGN NR  */
-#line 409 "lexer.y"
-                                                {declarare_variabila((yyvsp[-2].str), (yyvsp[-3].str), (yyvsp[0].nr), "DA");}
-#line 2414 "lexer.tab.c"
+#line 333 "lexer.y"
+                                                {var_declaring((yyvsp[-2].str), (yyvsp[-3].str), (yyvsp[0].nr), "YES");}
+#line 2412 "lexer.tab.c"
     break;
 
   case 23: /* dec: ID ASSIGN NR  */
-#line 410 "lexer.y"
-                                                {identificare_variabila((yyvsp[-2].str));Asignare((yyvsp[-2].str),(yyvsp[0].nr));}
-#line 2420 "lexer.tab.c"
+#line 334 "lexer.y"
+                                                {var_verification((yyvsp[-2].str));Assign((yyvsp[-2].str),(yyvsp[0].nr));}
+#line 2418 "lexer.tab.c"
     break;
 
   case 24: /* type: KEYWORD_CONST KEYWORD_TYPE  */
-#line 413 "lexer.y"
+#line 337 "lexer.y"
                                                 {strcat((yyvsp[-1].str)," ");strcat((yyvsp[-1].str),(yyvsp[0].str));(yyval.str)=(yyvsp[-1].str);}
-#line 2426 "lexer.tab.c"
+#line 2424 "lexer.tab.c"
     break;
 
   case 27: /* class_function: KEYWORD_CLASS_TYPE ':' KEYWORD_TYPE ID '(' function_parameters ')' '{' function_declarations '}'  */
-#line 420 "lexer.y"
-                                                                                                            {declarare_functie((yyvsp[-7].str),(yyvsp[-6].str),(yyvsp[-4].str));AfisareVariabile("in interiorul unei functii");}
-#line 2432 "lexer.tab.c"
+#line 344 "lexer.y"
+                                                                                                            {declaring_function((yyvsp[-7].str),(yyvsp[-6].str),(yyvsp[-4].str));PrintVar("the function");}
+#line 2430 "lexer.tab.c"
     break;
 
   case 28: /* class_function: KEYWORD_TYPE ID '(' function_parameters ')' '{' function_declarations '}'  */
-#line 421 "lexer.y"
-                                                                                                            {declarare_functie((yyvsp[-7].str),(yyvsp[-6].str),(yyvsp[-4].str));AfisareVariabile("in interiorul unei functii");}
-#line 2438 "lexer.tab.c"
+#line 345 "lexer.y"
+                                                                                                            {declaring_function((yyvsp[-7].str),(yyvsp[-6].str),(yyvsp[-4].str));PrintVar("the function");}
+#line 2436 "lexer.tab.c"
     break;
 
   case 29: /* class_function: KEYWORD_TYPE ID function_parameter  */
-#line 422 "lexer.y"
-                                                                                                            {declarare_functie((yyvsp[-2].str),(yyvsp[-1].str),(yyvsp[0].str));}
-#line 2444 "lexer.tab.c"
+#line 346 "lexer.y"
+                                                                                                            {declaring_function((yyvsp[-2].str),(yyvsp[-1].str),(yyvsp[0].str));}
+#line 2442 "lexer.tab.c"
     break;
 
   case 30: /* class_function: KEYWORD_TYPE ID function_parameter '{' function_declarations '}'  */
-#line 423 "lexer.y"
-                                                                                                            {declarare_functie((yyvsp[-5].str),(yyvsp[-4].str),(yyvsp[-3].str));AfisareVariabile("in interiorul unei functii");}
-#line 2450 "lexer.tab.c"
+#line 347 "lexer.y"
+                                                                                                            {declaring_function((yyvsp[-5].str),(yyvsp[-4].str),(yyvsp[-3].str));PrintVar("the function");}
+#line 2448 "lexer.tab.c"
     break;
 
   case 31: /* class_function: KEYWORD_TYPE ID '(' function_parameters ')'  */
-#line 424 "lexer.y"
-                                                                                                            {declarare_functie((yyvsp[-4].str),(yyvsp[-3].str),(yyvsp[-1].str));}
-#line 2456 "lexer.tab.c"
+#line 348 "lexer.y"
+                                                                                                            {declaring_function((yyvsp[-4].str),(yyvsp[-3].str),(yyvsp[-1].str));}
+#line 2454 "lexer.tab.c"
     break;
 
   case 32: /* function_parameters: function_parameters ',' function_parameter  */
-#line 427 "lexer.y"
+#line 351 "lexer.y"
                                                                     {strcat((yyvsp[0].str),";");strcat((yyvsp[0].str),(yyvsp[-2].str));(yyval.str)=(yyvsp[0].str);}
-#line 2462 "lexer.tab.c"
+#line 2460 "lexer.tab.c"
     break;
 
   case 33: /* function_parameters: function_parameter  */
-#line 428 "lexer.y"
+#line 352 "lexer.y"
                                                                     {strcat((yyvsp[0].str),";");}
-#line 2468 "lexer.tab.c"
+#line 2466 "lexer.tab.c"
     break;
 
   case 34: /* function_parameter: ID ASSIGN KEYWORD_TYPE  */
-#line 431 "lexer.y"
-                                                                    {declarare_variabila_fara_init((yyvsp[-2].str),(yyvsp[0].str),"NU");(yyval.str)=(yyvsp[0].str);}
-#line 2474 "lexer.tab.c"
+#line 355 "lexer.y"
+                                                                    {var_declaring_without_init((yyvsp[-2].str),(yyvsp[0].str),"NOPE");(yyval.str)=(yyvsp[0].str);}
+#line 2472 "lexer.tab.c"
     break;
 
   case 35: /* function_parameter: ID ASSIGN type  */
-#line 432 "lexer.y"
-                                                                    {declarare_variabila_fara_init((yyvsp[-2].str),(yyvsp[0].str),"DA");(yyval.str)=(yyvsp[0].str);}
-#line 2480 "lexer.tab.c"
+#line 356 "lexer.y"
+                                                                    {var_declaring_without_init((yyvsp[-2].str),(yyvsp[0].str),"YES");(yyval.str)=(yyvsp[0].str);}
+#line 2478 "lexer.tab.c"
     break;
 
   case 36: /* function_parameter: ID '[' ']' ASSIGN KEYWORD_TYPE  */
-#line 433 "lexer.y"
-                                                                    {declarare_variabila_fara_init((yyvsp[-4].str),(yyvsp[0].str),"NU"); (yyval.str)=(yyvsp[0].str);}
-#line 2486 "lexer.tab.c"
+#line 357 "lexer.y"
+                                                                    {var_declaring_without_init((yyvsp[-4].str),(yyvsp[0].str),"NOPE"); (yyval.str)=(yyvsp[0].str);}
+#line 2484 "lexer.tab.c"
     break;
 
   case 37: /* function_parameter: ID '[' ']' '[' ']' ASSIGN KEYWORD_TYPE  */
-#line 434 "lexer.y"
-                                                                    {declarare_variabila_fara_init((yyvsp[-6].str),(yyvsp[0].str),"NU");(yyval.str)=(yyvsp[0].str);}
-#line 2492 "lexer.tab.c"
+#line 358 "lexer.y"
+                                                                    {var_declaring_without_init((yyvsp[-6].str),(yyvsp[0].str),"NOPE");(yyval.str)=(yyvsp[0].str);}
+#line 2490 "lexer.tab.c"
     break;
 
   case 38: /* function_parameter: ID '[' NR ']' ASSIGN KEYWORD_TYPE  */
-#line 435 "lexer.y"
-                                                                    {declarare_variabila_fara_init((yyvsp[-5].str),(yyvsp[0].str),"NU");(yyval.str)=(yyvsp[0].str);}
-#line 2498 "lexer.tab.c"
+#line 359 "lexer.y"
+                                                                    {var_declaring_without_init((yyvsp[-5].str),(yyvsp[0].str),"NOPE");(yyval.str)=(yyvsp[0].str);}
+#line 2496 "lexer.tab.c"
     break;
 
   case 39: /* function_parameter: '&' ID ASSIGN KEYWORD_TYPE  */
-#line 436 "lexer.y"
-                                                                    {declarare_variabila_fara_init((yyvsp[-2].str),(yyvsp[0].str),"NU"); (yyval.str)=(yyvsp[0].str);}
-#line 2504 "lexer.tab.c"
+#line 360 "lexer.y"
+                                                                    {var_declaring_without_init((yyvsp[-2].str),(yyvsp[0].str),"NOPE"); (yyval.str)=(yyvsp[0].str);}
+#line 2502 "lexer.tab.c"
     break;
 
   case 40: /* function_parameter: '*' ID ASSIGN KEYWORD_TYPE  */
-#line 437 "lexer.y"
-                                                                    {declarare_variabila_fara_init((yyvsp[-2].str),(yyvsp[0].str),"NU"); (yyval.str)=(yyvsp[0].str);}
-#line 2510 "lexer.tab.c"
+#line 361 "lexer.y"
+                                                                    {var_declaring_without_init((yyvsp[-2].str),(yyvsp[0].str),"NOPE"); (yyval.str)=(yyvsp[0].str);}
+#line 2508 "lexer.tab.c"
     break;
 
   case 41: /* function_parameter: function_call  */
-#line 438 "lexer.y"
+#line 362 "lexer.y"
                                                                      {(yyval.str)=0;}
-#line 2516 "lexer.tab.c"
+#line 2514 "lexer.tab.c"
     break;
 
   case 42: /* function_parameter: '(' ')'  */
-#line 439 "lexer.y"
+#line 363 "lexer.y"
                                                                     {(yyval.str)=0;}
-#line 2522 "lexer.tab.c"
+#line 2520 "lexer.tab.c"
     break;
 
   case 43: /* function_call: ID ASSIGN ID '(' ids ')'  */
-#line 442 "lexer.y"
-                                                                     {identificare_variabila((yyvsp[-5].str)); identificare_functie((yyvsp[-3].str),(yyvsp[-1].str));}
-#line 2528 "lexer.tab.c"
+#line 366 "lexer.y"
+                                                                     {var_verification((yyvsp[-5].str)); identify_function((yyvsp[-3].str),(yyvsp[-1].str));}
+#line 2526 "lexer.tab.c"
     break;
 
   case 44: /* function_call: ID '(' ids ')'  */
-#line 443 "lexer.y"
-                                                                   {identificare_functie((yyvsp[-3].str),(yyvsp[-1].str));}
-#line 2534 "lexer.tab.c"
+#line 367 "lexer.y"
+                                                                   {identify_function((yyvsp[-3].str),(yyvsp[-1].str));}
+#line 2532 "lexer.tab.c"
     break;
 
   case 45: /* ids: ids ',' ID  */
-#line 446 "lexer.y"
+#line 370 "lexer.y"
                                                               {strcat((yyvsp[0].str),";");strcat((yyvsp[0].str),(yyvsp[-2].str));(yyval.str)=(yyvsp[0].str);}
-#line 2540 "lexer.tab.c"
+#line 2538 "lexer.tab.c"
     break;
 
   case 46: /* ids: ids ',' NR  */
-#line 447 "lexer.y"
+#line 371 "lexer.y"
                                                                {(yyval.str)=strdup("int;");strcat((yyval.str),(yyvsp[-2].str));}
-#line 2546 "lexer.tab.c"
+#line 2544 "lexer.tab.c"
     break;
 
   case 47: /* ids: ID  */
-#line 448 "lexer.y"
+#line 372 "lexer.y"
                                                                   {strcat((yyvsp[0].str),";");(yyval.str)=(yyvsp[0].str);}
-#line 2552 "lexer.tab.c"
+#line 2550 "lexer.tab.c"
     break;
 
   case 48: /* ids: NR  */
-#line 449 "lexer.y"
+#line 373 "lexer.y"
                                                                   {(yyval.str)=strdup("int;");}
-#line 2558 "lexer.tab.c"
+#line 2556 "lexer.tab.c"
     break;
 
   case 49: /* op: ID  */
-#line 452 "lexer.y"
-                                                                    {identificare_variabila((yyvsp[0].str));}
-#line 2564 "lexer.tab.c"
+#line 376 "lexer.y"
+                                                                    {var_verification((yyvsp[0].str));}
+#line 2562 "lexer.tab.c"
     break;
 
   case 56: /* global: global expression  */
-#line 467 "lexer.y"
-                                                {AfisareVariabile("global");}
-#line 2570 "lexer.tab.c"
+#line 391 "lexer.y"
+                                                {PrintVar("global");}
+#line 2568 "lexer.tab.c"
     break;
 
   case 57: /* global: global global_function  */
-#line 468 "lexer.y"
-                                                {AfisareFunctii("global");}
-#line 2576 "lexer.tab.c"
+#line 392 "lexer.y"
+                                                {PrintFunct("global");}
+#line 2574 "lexer.tab.c"
     break;
 
   case 60: /* global_function: KEYWORD_TYPE ID '(' function_parameters ')' '{' function_declarations '}'  */
-#line 473 "lexer.y"
-                                                                                          {declarare_functie((yyvsp[-7].str),(yyvsp[-6].str),(yyvsp[-4].str));AfisareVariabile("in interiorul unei functii");}
-#line 2582 "lexer.tab.c"
+#line 397 "lexer.y"
+                                                                                          {declaring_function((yyvsp[-7].str),(yyvsp[-6].str),(yyvsp[-4].str));PrintVar("the function");}
+#line 2580 "lexer.tab.c"
     break;
 
   case 61: /* global_function: KEYWORD_TYPE ID function_parameter '{' function_declarations '}'  */
-#line 474 "lexer.y"
-                                                                                          {declarare_functie((yyvsp[-5].str),(yyvsp[-4].str),(yyvsp[-3].str));AfisareVariabile("in interiorul unei functii");}
-#line 2588 "lexer.tab.c"
+#line 398 "lexer.y"
+                                                                                          {declaring_function((yyvsp[-5].str),(yyvsp[-4].str),(yyvsp[-3].str));PrintVar("the function");}
+#line 2586 "lexer.tab.c"
     break;
 
   case 62: /* program: declarations  */
-#line 477 "lexer.y"
-                                                    {AfisareVariabile("main");Afisare_expresie();}
-#line 2594 "lexer.tab.c"
+#line 401 "lexer.y"
+                                                    {PrintVar("main");show_exp();}
+#line 2592 "lexer.tab.c"
     break;
 
   case 73: /* declaration: EVAL '(' expr ')'  */
-#line 492 "lexer.y"
-                                                    {Adaugare_argument((yyvsp[-1].nr));}
-#line 2600 "lexer.tab.c"
+#line 416 "lexer.y"
+                                                    {add_arg((yyvsp[-1].nr));}
+#line 2598 "lexer.tab.c"
     break;
 
   case 91: /* content: KEYWORD_TYPE ID ASSIGN NR ';' cond ';' ID INC  */
-#line 520 "lexer.y"
-                                                                {declarare_variabila((yyvsp[-7].str),(yyvsp[-8].str),(yyvsp[-5].nr),"NU");identificare_variabila((yyvsp[-7].str));}
-#line 2606 "lexer.tab.c"
+#line 444 "lexer.y"
+                                                                {var_declaring((yyvsp[-7].str),(yyvsp[-8].str),(yyvsp[-5].nr),"NOPE");var_verification((yyvsp[-7].str));}
+#line 2604 "lexer.tab.c"
     break;
 
   case 92: /* content: KEYWORD_TYPE ID ASSIGN NR ';' cond ';' ID DEC  */
-#line 521 "lexer.y"
-                                                                {declarare_variabila((yyvsp[-7].str),(yyvsp[-8].str),(yyvsp[-5].nr),"NU");identificare_variabila((yyvsp[-7].str));}
-#line 2612 "lexer.tab.c"
+#line 445 "lexer.y"
+                                                                {var_declaring((yyvsp[-7].str),(yyvsp[-8].str),(yyvsp[-5].nr),"NOPE");var_verification((yyvsp[-7].str));}
+#line 2610 "lexer.tab.c"
     break;
 
   case 93: /* content: ID ASSIGN NR ';' cond ';' ID DEC  */
-#line 522 "lexer.y"
-                                                                {identificare_variabila((yyvsp[-7].str));identificare_variabila((yyvsp[-1].str));}
-#line 2618 "lexer.tab.c"
+#line 446 "lexer.y"
+                                                                {var_verification((yyvsp[-7].str));var_verification((yyvsp[-1].str));}
+#line 2616 "lexer.tab.c"
     break;
 
   case 94: /* content: ID ASSIGN NR ';' cond ';' ID INC  */
-#line 523 "lexer.y"
-                                                                {identificare_variabila((yyvsp[-7].str));identificare_variabila((yyvsp[-1].str));}
-#line 2624 "lexer.tab.c"
+#line 447 "lexer.y"
+                                                                {var_verification((yyvsp[-7].str));var_verification((yyvsp[-1].str));}
+#line 2622 "lexer.tab.c"
     break;
 
   case 95: /* cond: ID '>' '=' expr  */
-#line 526 "lexer.y"
-                                                    {identificare_variabila((yyvsp[-3].str));Asignare((yyvsp[-3].str),(yyvsp[0].nr) + 1); }
-#line 2630 "lexer.tab.c"
+#line 450 "lexer.y"
+                                                    {var_verification((yyvsp[-3].str));Assign((yyvsp[-3].str),(yyvsp[0].nr) + 1); }
+#line 2628 "lexer.tab.c"
     break;
 
   case 96: /* cond: ID '<' '=' expr  */
-#line 527 "lexer.y"
-                                                    {identificare_variabila((yyvsp[-3].str));Asignare((yyvsp[-3].str),(yyvsp[0].nr) + 1);}
-#line 2636 "lexer.tab.c"
+#line 451 "lexer.y"
+                                                    {var_verification((yyvsp[-3].str));Assign((yyvsp[-3].str),(yyvsp[0].nr) + 1);}
+#line 2634 "lexer.tab.c"
     break;
 
   case 97: /* cond: ID '!' '=' expr  */
-#line 528 "lexer.y"
-                                                    {identificare_variabila((yyvsp[-3].str));Asignare((yyvsp[-3].str), (yyvsp[0].nr));}
-#line 2642 "lexer.tab.c"
+#line 452 "lexer.y"
+                                                    {var_verification((yyvsp[-3].str));Assign((yyvsp[-3].str), (yyvsp[0].nr));}
+#line 2640 "lexer.tab.c"
     break;
 
   case 98: /* cond: ID '<' expr  */
-#line 529 "lexer.y"
-                                                    {identificare_variabila((yyvsp[-2].str));Asignare((yyvsp[-2].str),(yyvsp[0].nr));}
-#line 2648 "lexer.tab.c"
+#line 453 "lexer.y"
+                                                    {var_verification((yyvsp[-2].str));Assign((yyvsp[-2].str),(yyvsp[0].nr));}
+#line 2646 "lexer.tab.c"
     break;
 
   case 99: /* cond: ID '>' expr  */
-#line 530 "lexer.y"
-                                                    {identificare_variabila((yyvsp[-2].str));Asignare((yyvsp[-2].str),(yyvsp[0].nr));}
-#line 2654 "lexer.tab.c"
+#line 454 "lexer.y"
+                                                    {var_verification((yyvsp[-2].str));Assign((yyvsp[-2].str),(yyvsp[0].nr));}
+#line 2652 "lexer.tab.c"
     break;
 
   case 104: /* string_function: STRLEN '(' ID ')'  */
-#line 541 "lexer.y"
-                                                     {identificare_variabila((yyvsp[-1].str));}
-#line 2660 "lexer.tab.c"
+#line 465 "lexer.y"
+                                                     {var_verification((yyvsp[-1].str));}
+#line 2658 "lexer.tab.c"
     break;
 
   case 105: /* string_function: STRCPY '(' ID ',' ID ')'  */
-#line 542 "lexer.y"
-                                                     {identificare_variabila((yyvsp[-3].str));identificare_variabila((yyvsp[-1].str));}
-#line 2666 "lexer.tab.c"
+#line 466 "lexer.y"
+                                                     {var_verification((yyvsp[-3].str));var_verification((yyvsp[-1].str));}
+#line 2664 "lexer.tab.c"
     break;
 
   case 106: /* string_function: STRSTR '(' ID ',' ID ')'  */
-#line 543 "lexer.y"
-                                                     {identificare_variabila((yyvsp[-3].str));identificare_variabila((yyvsp[-1].str));}
-#line 2672 "lexer.tab.c"
+#line 467 "lexer.y"
+                                                     {var_verification((yyvsp[-3].str));var_verification((yyvsp[-1].str));}
+#line 2670 "lexer.tab.c"
     break;
 
   case 107: /* string_function: STRCMP '(' ID ',' ID ')'  */
-#line 544 "lexer.y"
-                                                     {identificare_variabila((yyvsp[-3].str));identificare_variabila((yyvsp[-1].str));}
-#line 2678 "lexer.tab.c"
+#line 468 "lexer.y"
+                                                     {var_verification((yyvsp[-3].str));var_verification((yyvsp[-1].str));}
+#line 2676 "lexer.tab.c"
     break;
 
   case 108: /* string_function: STRCHR '(' ID ',' ID ')'  */
-#line 545 "lexer.y"
-                                                     {identificare_variabila((yyvsp[-3].str));identificare_variabila((yyvsp[-1].str));}
-#line 2684 "lexer.tab.c"
+#line 469 "lexer.y"
+                                                     {var_verification((yyvsp[-3].str));var_verification((yyvsp[-1].str));}
+#line 2682 "lexer.tab.c"
     break;
 
   case 109: /* string_function: STRCAT '(' ID ',' ID ')'  */
-#line 546 "lexer.y"
-                                                     {identificare_variabila((yyvsp[-3].str));identificare_variabila((yyvsp[-1].str));}
-#line 2690 "lexer.tab.c"
+#line 470 "lexer.y"
+                                                     {var_verification((yyvsp[-3].str));var_verification((yyvsp[-1].str));}
+#line 2688 "lexer.tab.c"
     break;
 
   case 110: /* expression: ID ASSIGN expr  */
-#line 549 "lexer.y"
-                                                            {identificare_variabila((yyvsp[-2].str));Asignare((yyvsp[-2].str),(yyvsp[0].nr));}
-#line 2696 "lexer.tab.c"
+#line 473 "lexer.y"
+                                                            {var_verification((yyvsp[-2].str));Assign((yyvsp[-2].str),(yyvsp[0].nr));}
+#line 2694 "lexer.tab.c"
     break;
 
   case 112: /* expression: ID DEC  */
-#line 551 "lexer.y"
-                                                            {identificare_variabila((yyvsp[-1].str));decrementare((yyvsp[-1].str));}
-#line 2702 "lexer.tab.c"
+#line 475 "lexer.y"
+                                                            {var_verification((yyvsp[-1].str));decr((yyvsp[-1].str));}
+#line 2700 "lexer.tab.c"
     break;
 
   case 113: /* expression: ID INC  */
-#line 552 "lexer.y"
-                                                            {identificare_variabila((yyvsp[-1].str));incrementare((yyvsp[-1].str));}
-#line 2708 "lexer.tab.c"
+#line 476 "lexer.y"
+                                                            {var_verification((yyvsp[-1].str));incr((yyvsp[-1].str));}
+#line 2706 "lexer.tab.c"
     break;
 
   case 114: /* expression: ID ASSIGN KEYWORD_TYPE  */
-#line 553 "lexer.y"
-                                                            {declarare_variabila_fara_init((yyvsp[-2].str), (yyvsp[0].str),"NU");}
-#line 2714 "lexer.tab.c"
+#line 477 "lexer.y"
+                                                            {var_declaring_without_init((yyvsp[-2].str), (yyvsp[0].str),"NOPE");}
+#line 2712 "lexer.tab.c"
     break;
 
   case 115: /* expression: ID ASSIGN type  */
-#line 554 "lexer.y"
-                                                            {declarare_variabila_fara_init((yyvsp[-2].str), (yyvsp[0].str), "DA");}
-#line 2720 "lexer.tab.c"
+#line 478 "lexer.y"
+                                                            {var_declaring_without_init((yyvsp[-2].str), (yyvsp[0].str), "YES");}
+#line 2718 "lexer.tab.c"
     break;
 
   case 116: /* expression: KEYWORD_TYPE ID ASSIGN NR  */
-#line 555 "lexer.y"
-                                                            {declarare_variabila((yyvsp[-2].str), (yyvsp[-3].str), (yyvsp[0].nr), "NU");}
-#line 2726 "lexer.tab.c"
+#line 479 "lexer.y"
+                                                            {var_declaring((yyvsp[-2].str), (yyvsp[-3].str), (yyvsp[0].nr), "NOPE");}
+#line 2724 "lexer.tab.c"
     break;
 
   case 117: /* expression: ID '[' NR ']' ASSIGN KEYWORD_TYPE  */
-#line 556 "lexer.y"
-                                                            {declarare_variabila_fara_init((yyvsp[-5].str),(yyvsp[0].str),"NU");}
-#line 2732 "lexer.tab.c"
+#line 480 "lexer.y"
+                                                            {var_declaring_without_init((yyvsp[-5].str),(yyvsp[0].str),"NOPE");}
+#line 2730 "lexer.tab.c"
     break;
 
   case 118: /* expression: ID '[' NR ']' ASSIGN '/' '/' array '/' '/'  */
-#line 557 "lexer.y"
-                                                           {identificare_variabila((yyvsp[-9].str));}
-#line 2738 "lexer.tab.c"
+#line 481 "lexer.y"
+                                                            {var_verification((yyvsp[-9].str));}
+#line 2736 "lexer.tab.c"
     break;
 
   case 119: /* expression: ID '[' NR ']' '[' NR ']' ASSIGN KEYWORD_TYPE  */
-#line 558 "lexer.y"
-                                                            {declarare_variabila_fara_init((yyvsp[-8].str),(yyvsp[0].str),"NU");}
-#line 2744 "lexer.tab.c"
+#line 482 "lexer.y"
+                                                            {var_declaring_without_init((yyvsp[-8].str),(yyvsp[0].str),"NOPE");}
+#line 2742 "lexer.tab.c"
     break;
 
   case 121: /* expression: type ID ASSIGN NR  */
-#line 560 "lexer.y"
-                                                            {declarare_variabila((yyvsp[-2].str), (yyvsp[-3].str), (yyvsp[0].nr),"DA");}
-#line 2750 "lexer.tab.c"
+#line 484 "lexer.y"
+                                                            {var_declaring((yyvsp[-2].str), (yyvsp[-3].str), (yyvsp[0].nr),"YES");}
+#line 2748 "lexer.tab.c"
     break;
 
   case 131: /* expr: expr '+' expr  */
-#line 579 "lexer.y"
+#line 503 "lexer.y"
                             {(yyval.nr) = (yyvsp[-2].nr) + (yyvsp[0].nr);}
-#line 2756 "lexer.tab.c"
+#line 2754 "lexer.tab.c"
     break;
 
   case 132: /* expr: expr '-' expr  */
-#line 580 "lexer.y"
+#line 504 "lexer.y"
                             {(yyval.nr) = (yyvsp[-2].nr) - (yyvsp[0].nr);}
-#line 2762 "lexer.tab.c"
+#line 2760 "lexer.tab.c"
     break;
 
   case 133: /* expr: expr '*' expr  */
-#line 581 "lexer.y"
+#line 505 "lexer.y"
                             {(yyval.nr) = (yyvsp[-2].nr) * (yyvsp[0].nr);}
-#line 2768 "lexer.tab.c"
+#line 2766 "lexer.tab.c"
     break;
 
   case 134: /* expr: expr ':' expr  */
-#line 582 "lexer.y"
+#line 506 "lexer.y"
                             {(yyval.nr) = (yyvsp[-2].nr) / (yyvsp[0].nr);}
-#line 2774 "lexer.tab.c"
+#line 2772 "lexer.tab.c"
     break;
 
   case 135: /* expr: '(' expr ')'  */
-#line 583 "lexer.y"
+#line 507 "lexer.y"
                             {(yyval.nr) =(yyvsp[-1].nr);}
-#line 2780 "lexer.tab.c"
+#line 2778 "lexer.tab.c"
     break;
 
   case 136: /* expr: NR  */
-#line 584 "lexer.y"
+#line 508 "lexer.y"
                             {(yyval.nr)=(yyvsp[0].nr);}
-#line 2786 "lexer.tab.c"
+#line 2784 "lexer.tab.c"
     break;
 
   case 137: /* expr: ID  */
-#line 585 "lexer.y"
-                            {identificare_variabila((yyvsp[0].str));verificare_initializare((yyvsp[0].str));(yyval.nr)=returnare_valoare((yyvsp[0].str));}
-#line 2792 "lexer.tab.c"
+#line 509 "lexer.y"
+                            {var_verification((yyvsp[0].str));initialization_verify((yyvsp[0].str));(yyval.nr)=return_value((yyvsp[0].str));}
+#line 2790 "lexer.tab.c"
     break;
 
   case 138: /* expr: string_function  */
-#line 586 "lexer.y"
+#line 510 "lexer.y"
                              {(yyval.nr)=0;}
-#line 2798 "lexer.tab.c"
+#line 2796 "lexer.tab.c"
     break;
 
   case 139: /* expr: ID '[' op ']'  */
-#line 587 "lexer.y"
+#line 511 "lexer.y"
                             {(yyval.nr)=0;}
-#line 2804 "lexer.tab.c"
+#line 2802 "lexer.tab.c"
     break;
 
   case 140: /* expr: ID '[' op ']' '[' op ']'  */
-#line 588 "lexer.y"
+#line 512 "lexer.y"
                             {(yyval.nr)=0;}
-#line 2810 "lexer.tab.c"
+#line 2808 "lexer.tab.c"
     break;
 
   case 141: /* expr: '+' expr  */
-#line 589 "lexer.y"
+#line 513 "lexer.y"
                             {(yyval.nr) =(yyval.nr) + (yyvsp[0].nr);}
-#line 2816 "lexer.tab.c"
+#line 2814 "lexer.tab.c"
     break;
 
   case 142: /* expr: '-' expr  */
-#line 590 "lexer.y"
+#line 514 "lexer.y"
                             {(yyval.nr) =(yyval.nr) - (yyvsp[0].nr);}
-#line 2822 "lexer.tab.c"
+#line 2820 "lexer.tab.c"
     break;
 
   case 143: /* expr: '*' expr  */
-#line 591 "lexer.y"
+#line 515 "lexer.y"
                             {(yyval.nr) =(yyval.nr) * (yyvsp[0].nr);}
-#line 2828 "lexer.tab.c"
+#line 2826 "lexer.tab.c"
     break;
 
   case 144: /* expr: ':' expr  */
-#line 592 "lexer.y"
+#line 516 "lexer.y"
                             {(yyval.nr) =(yyval.nr) /(yyvsp[0].nr);}
-#line 2834 "lexer.tab.c"
+#line 2832 "lexer.tab.c"
     break;
 
   case 145: /* expr: function_call  */
-#line 593 "lexer.y"
+#line 517 "lexer.y"
                              {(yyval.nr)=1;}
-#line 2840 "lexer.tab.c"
+#line 2838 "lexer.tab.c"
     break;
 
   case 146: /* expr: ID '.' ID  */
-#line 594 "lexer.y"
+#line 518 "lexer.y"
                             {(yyval.nr)=0;}
-#line 2846 "lexer.tab.c"
+#line 2844 "lexer.tab.c"
     break;
 
   case 147: /* expr: ID '.' function_call  */
-#line 595 "lexer.y"
+#line 519 "lexer.y"
                              {(yyval.nr)=0;}
-#line 2852 "lexer.tab.c"
+#line 2850 "lexer.tab.c"
     break;
 
   case 148: /* expr: ID '.' ID '(' ')'  */
-#line 596 "lexer.y"
+#line 520 "lexer.y"
                             {(yyval.nr)=0;}
-#line 2858 "lexer.tab.c"
+#line 2856 "lexer.tab.c"
     break;
 
   case 149: /* expr: GHI ID GHI  */
-#line 597 "lexer.y"
+#line 521 "lexer.y"
                             {(yyval.nr)=0;}
-#line 2864 "lexer.tab.c"
+#line 2862 "lexer.tab.c"
     break;
 
   case 154: /* elem_printing: elem_printing ',' ID  */
-#line 610 "lexer.y"
-                                          {identificare_variabila((yyvsp[0].str));}
-#line 2870 "lexer.tab.c"
+#line 534 "lexer.y"
+                                          {var_verification((yyvsp[0].str));}
+#line 2868 "lexer.tab.c"
     break;
 
   case 155: /* elem_printing: ID  */
-#line 611 "lexer.y"
-                                        {identificare_variabila((yyvsp[0].str));}
-#line 2876 "lexer.tab.c"
+#line 535 "lexer.y"
+                                        {var_verification((yyvsp[0].str));}
+#line 2874 "lexer.tab.c"
     break;
 
 
-#line 2880 "lexer.tab.c"
+#line 2878 "lexer.tab.c"
 
         default: break;
       }
@@ -3112,7 +3110,7 @@ yyreturn:
   return yyresult;
 }
 
-#line 613 "lexer.y"
+#line 537 "lexer.y"
 
 
 int yywrap(void) {
@@ -3120,7 +3118,7 @@ int yywrap(void) {
 }
 
 int yyerror(char * s){
-printf("eroare: %s la linia:%d\n",s,yylineno);
+printf("erorr: %s at line:%d\n",s,yylineno);
 }
 
 int main(int argc, char** argv){
@@ -3129,10 +3127,10 @@ int main(int argc, char** argv){
  FILE* s;
  if(NULL == (s = fopen("symbol_table.txt","w")))
     {
-        perror("Eroare la deschiderea fisierului de prelucrat!\n");
+        perror("Error opening file to process!\n");
         exit(1);
     }
-    else {printf("S-a creat cu succes\n");}
+    else {printf("It was successfully created\n");}
           
  fclose(s);  
    
