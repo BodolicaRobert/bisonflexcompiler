@@ -340,6 +340,10 @@ void decrementare(char * nume)
 }
 
 %}
+
+%define parse.lac full 
+%define parse.error verbose
+
 %left ',' ';'
 %left '+''-' 
 %left ':''*'
@@ -354,7 +358,7 @@ void decrementare(char * nume)
 %left '"' '#'
 
 %start start
-%token KEYWORD_IF KEYWORD_WHILE KEYWORD_ELSE KEYWORD_FOR AND OR ASSIGN KEYWORD_CLASS MAIN GHI LIBRARY EQUAL INCLUDE KEYWORD_RETURN READ WRITE 
+%token KEYWORD_IF KEYWORD_WHILE KEYWORD_ELSE KEYWORD_FOR AND OR ASSIGN KEYWORD_CLASS MAIN GHI LIBRARY EQUAL KEYWORD_INCLUDE KEYWORD_RETURN READ WRITE 
 
 %union {
       int nr;
@@ -366,15 +370,15 @@ void decrementare(char * nume)
 %type<nr> expr
 %type<str> type class_method function_parameter function_parameters ids
 %%
-start:biblioteci clase global KEYWORD_TYPE MAIN '{' program '}' {printf("programul este acceptat\n");}
+start:libraries classes global KEYWORD_TYPE MAIN '{' program '}' {printf("programul este acceptat\n");}
      ;
 
 libraries:libraries library
           |library
           ;
 
-library:'#'INCLUDE'<'LIBRARY'>'  
-          |'#'INCLUDE GHI LIBRARY GHI
+library:'#'KEYWORD_INCLUDE'<'LIBRARY'>'  
+          |'#'KEYWORD_INCLUDE GHI LIBRARY GHI
           ;        
 
 classes:classes class 
@@ -400,7 +404,7 @@ class_dec:class_dec dec
 
 dec:ID ASSIGN KEYWORD_TYPE                      {declarare_variabila_fara_init($1, $3,"NU");}
    |ID ASSIGN type                              {declarare_variabila_fara_init($1, $3,"DA");}
-   |ID'['NR']''['NR']' ASSIGN KEYWORD_TYPEP     { declarare_variabila_fara_init($1,$9,"NU");}
+   |ID'['NR']''['NR']' ASSIGN KEYWORD_TYPE      { declarare_variabila_fara_init($1,$9,"NU");}
    |ID'['NR']' ASSIGN KEYWORD_TYPE              { declarare_variabila_fara_init($1,$6,"NU");}
    |type ID ASSIGN NR                           {declarare_variabila($2, $1, $4, "DA");}
    |ID ASSIGN NR                                {identificare_variabila($1);Asignare($1,$3);}
@@ -425,98 +429,98 @@ function_parameters:function_parameters',' function_parameter       {strcat($3,"
                    ;   
 
 function_parameter: ID ASSIGN KEYWORD_TYPE                          {declarare_variabila_fara_init($1,$3,"NU");$$=$3;}
-                  |ID ASSIGN tip                                    {declarare_variabila_fara_init($1,$3,"DA");$$=$3;}
-                  |ID'['']' ASSIGN TIP                              {declarare_variabila_fara_init($1,$5,"NU"); $$=$5;}      
-                  |ID'['']''['']' ASSIGN TIP                        {declarare_variabila_fara_init($1,$7,"NU");$$=$7;}
-                  |ID'['NR']' ASSIGN TIP                            {declarare_variabila_fara_init($1,$6,"NU");$$=$6;}
-                  |'&' ID ASSIGN TIP                                {declarare_variabila_fara_init($2,$4,"NU"); $$=$4;}
-                  |'*' ID ASSIGN TIP                                {declarare_variabila_fara_init($2,$4,"NU"); $$=$4;}
-                  |apel_functie                                     {$$=0;}
-                  |'('')'                                           { $$=0;}
+                  |ID ASSIGN type                                   {declarare_variabila_fara_init($1,$3,"DA");$$=$3;}
+                  |ID'['']' ASSIGN KEYWORD_TYPE                     {declarare_variabila_fara_init($1,$5,"NU"); $$=$5;}      
+                  |ID'['']''['']' ASSIGN KEYWORD_TYPE               {declarare_variabila_fara_init($1,$7,"NU");$$=$7;}
+                  |ID'['NR']' ASSIGN KEYWORD_TYPE                   {declarare_variabila_fara_init($1,$6,"NU");$$=$6;}
+                  |'&' ID ASSIGN KEYWORD_TYPE                       {declarare_variabila_fara_init($2,$4,"NU"); $$=$4;}
+                  |'*' ID ASSIGN KEYWORD_TYPE                       {declarare_variabila_fara_init($2,$4,"NU"); $$=$4;}
+                  |function_call                                     {$$=0;}
+                  |'('')'                                           {$$=0;}
                   ;
 
-apel_functie:ID ASSIGN ID '(' id_uri ')'                            {identificare_variabila($1); identificare_functie($3,$5);}
-            |ID '(' id_uri ')'                                      {identificare_functie($1,$3);}
+function_call:ID ASSIGN ID '(' ids ')'                               {identificare_variabila($1); identificare_functie($3,$5);}
+            |ID '(' ids ')'                                        {identificare_functie($1,$3);}
             ;
 
-id_uri:id_uri','ID                                                  {strcat($3,";");strcat($3,$1);$$=$3;}
-      |id_uri','NR                                                  {$$=strdup("int;");strcat($$,$1);}
-      |ID                                                           {strcat($1,";");$$=$1;}
-      |NR                                                           {$$=strdup("int;");}
-      ; 
+ids:ids','ID                                                  {strcat($3,";");strcat($3,$1);$$=$3;}
+    |ids','NR                                                  {$$=strdup("int;");strcat($$,$1);}
+    |ID                                                           {strcat($1,";");$$=$1;}
+    |NR                                                           {$$=strdup("int;");}
+    ; 
 
 op:ID                                                               {identificare_variabila($1);}
   |NR 
   ;   
 
-function_declarations:function_declarations declaratieFC 
-                     |declaratieFC
+function_declarations:function_declarations function_declaration 
+                     |function_declaration
                      ; 
 
-declaratieFC:declaratie
+function_declaration:declaration
             |return 
             ;
 
-return:RET op
+return:KEYWORD_RETURN op
       ;
 
-global:global expresie                          {AfisareVariabile("global");}
-      |global functie_global                    {AfisareFunctii("global");}
-      |expresie 
-      |functie_global
+global:global expression                        {AfisareVariabile("global");}
+      |global global_function                   {AfisareFunctii("global");}
+      |expression 
+      |global_function
       ;
 
-functie_global:TIP ID'('function_parameters')''{'function_declarations'}'       {declarare_functie($1,$2,$4);AfisareVariabile("in interiorul unei functii");}
-              |TIP ID function_parameter '{'function_declarations'}'            {declarare_functie($1,$2,$3);AfisareVariabile("in interiorul unei functii");}   
-              ;
+global_function:KEYWORD_TYPE ID'('function_parameters')''{'function_declarations'}'       {declarare_functie($1,$2,$4);AfisareVariabile("in interiorul unei functii");}
+               |KEYWORD_TYPE ID function_parameter '{'function_declarations'}'            {declarare_functie($1,$2,$3);AfisareVariabile("in interiorul unei functii");}   
+               ;
 
-program:declaratii /*liniile de cod*/           {AfisareVariabile("main");Afisare_expresie();}
+program:declarations /*liniile de cod*/             {AfisareVariabile("main");Afisare_expresie();}
        ;
 
-declaratii:declaratii declaratie
-          |declaratie
+declarations:declarations declaration
+          |declaration
           ;
 
-declaratie:IF'('conditii')' '{'instructiuni'}'
-          |ELSE'{'instructiuni'}'
-          |FOR'('continut')''{'instructiuni'}'
-          |WHILE'('conditii')''{'instructiuni'}'
-          |citire
-          |afisare
-          |functie_siruri 
-          |expresie
-          |EVAL'('expr')' {Adaugare_argument($3);}
-          ;
+declaration:KEYWORD_IF'('conditions')' '{'instructions'}'
+           |KEYWORD_ELSE'{'instructions'}'
+           |KEYWORD_FOR'('content')''{'instructions'}'
+           |KEYWORD_WHILE'('conditions')''{'instructions'}'
+           |reading
+           |printing
+           |string_function 
+           |expression
+           |EVAL'('expr')'                          {Adaugare_argument($3);}
+           ;
          
-conditii:conditii operator_logic conditie
-        |conditii operator_logic '('conditie')'
-        |operator_logic conditie
-        |operator_logic'('conditie')'
-        |conditie
-        |'('conditie')'
-        ;
+conditions:conditions logic_operator condition
+          |conditions logic_operator '('condition')'
+          |logic_operator condition
+          |logic_operator'('condition')'
+          |condition
+          |'('condition')'
+          ;
 
-conditie:expr operator_artimetic expr
-        |'!' '('expr operator_artimetic expr')'
-        ;
+condition:expr arithmetic_operator expr
+         |'!' '('expr arithmetic_operator expr')'
+         ;
 
-operator_artimetic:'>''='   
-                  |'<''='
-                  |'!''='
-                  |'>'
-                  |'<' 
-                  |EQUAL
-                  ;
+arithmetic_operator:'>''='   
+                   |'<''='
+                   |'!''='
+                   |'>'
+                   |'<' 
+                   |EQUAL
+                   ;
 
-operator_logic:AND  
+logic_operator:AND  
               |OR
               |'!'
               ;   
 
-continut:TIP ID ASSIGN NR';'cond';'ID INC           {declarare_variabila($2,$1,$4,"NU");identificare_variabila($2);}
-        |TIP ID ASSIGN NR';'cond';'ID DEC           {declarare_variabila($2,$1,$4,"NU");identificare_variabila($2);}
-        |ID ASSIGN NR ';'cond';'ID DEC              {identificare_variabila($1);identificare_variabila($7);}
-        |ID ASSIGN NR ';'cond';'ID INC              {identificare_variabila($1);identificare_variabila($7);}
+content:KEYWORD_TYPE ID ASSIGN NR';'cond';'ID INC               {declarare_variabila($2,$1,$4,"NU");identificare_variabila($2);}
+        |KEYWORD_TYPE ID ASSIGN NR';'cond';'ID DEC              {declarare_variabila($2,$1,$4,"NU");identificare_variabila($2);}
+        |ID ASSIGN NR ';'cond';'ID DEC                          {identificare_variabila($1);identificare_variabila($7);}
+        |ID ASSIGN NR ';'cond';'ID INC                          {identificare_variabila($1);identificare_variabila($7);}
         ;
 
 cond:   ID '>''=' expr                              {identificare_variabila($1);Asignare($1,$4 + 1); }
@@ -526,48 +530,49 @@ cond:   ID '>''=' expr                              {identificare_variabila($1);
         |ID'>'expr                                  {identificare_variabila($1);Asignare($1,$3);} 
         ;                            
 
-instructiuni:instructiuni instructiune
-            |instructiune
+instructions:instructions instruction
+            |instruction
             ;  
 
-instructiune:declaratie
+instruction:declaration
             |return 
             ;
 
-functie_siruri:STRLEN'('ID')'                       {identificare_variabila($3);}
-              |STRCPY'('ID','ID')'                  {identificare_variabila($3);identificare_variabila($5);}
-              |STRSTR'('ID','ID')'                  {identificare_variabila($3);identificare_variabila($5);}
-              |STRCMP'('ID','ID')'                  {identificare_variabila($3);identificare_variabila($5);}
-              |STRCHR'('ID','ID')'                  {identificare_variabila($3);identificare_variabila($5);}
-              |STRCAT'('ID','ID')'                  {identificare_variabila($3);identificare_variabila($5);}
-              ;
-expresie:ID ASSIGN expr                             {identificare_variabila($1);Asignare($1,$3);}
-        |ID'('vector')'  /* apelul pt functii void */
-        |ID DEC                                     {identificare_variabila($1);decrementare($1);}
-        |ID INC                                     {identificare_variabila($1);incrementare($1);}
-        |ID ASSIGN TIP                              {declarare_variabila_fara_init($1, $3,"NU");}
-        |ID ASSIGN tip                              {declarare_variabila_fara_init($1, $3, "DA");} 
-        |TIP ID ASSIGN NR                           {declarare_variabila($2, $1, $4, "NU");}
-        |ID '['NR']'ASSIGN TIP                      {declarare_variabila_fara_init($1,$6,"NU");}
-        |ID '['NR']'ASSIGN'/''/'vector'/''/'        {identificare_variabila($1);}
-        |ID '['NR']''['NR']'ASSIGN TIP              {declarare_variabila_fara_init($1,$9,"NU");}
-        |ID '['NR']''['NR']'ASSIGN'/''/'matrice'/''/'
-        |tip ID ASSIGN NR                           {declarare_variabila($2, $1, $4,"DA");}
+string_function:STRLEN'('ID')'                       {identificare_variabila($3);}
+               |STRCPY'('ID','ID')'                  {identificare_variabila($3);identificare_variabila($5);}
+               |STRSTR'('ID','ID')'                  {identificare_variabila($3);identificare_variabila($5);}
+               |STRCMP'('ID','ID')'                  {identificare_variabila($3);identificare_variabila($5);}
+               |STRCHR'('ID','ID')'                  {identificare_variabila($3);identificare_variabila($5);}
+               |STRCAT'('ID','ID')'                  {identificare_variabila($3);identificare_variabila($5);}
+               ;
+
+expression:ID ASSIGN expr                                   {identificare_variabila($1);Asignare($1,$3);}
+        |ID'('array')'  /* apelul pt functii void */
+        |ID DEC                                             {identificare_variabila($1);decrementare($1);}
+        |ID INC                                             {identificare_variabila($1);incrementare($1);}
+        |ID ASSIGN KEYWORD_TYPE                             {declarare_variabila_fara_init($1, $3,"NU");}
+        |ID ASSIGN type                                     {declarare_variabila_fara_init($1, $3, "DA");} 
+        |KEYWORD_TYPE ID ASSIGN NR                          {declarare_variabila($2, $1, $4, "NU");}
+        |ID '['NR']'ASSIGN KEYWORD_TYPE                     {declarare_variabila_fara_init($1,$6,"NU");}
+        |ID '['NR']'ASSIGN'/''/'array'/''/'                {identificare_variabila($1);}
+        |ID '['NR']''['NR']'ASSIGN KEYWORD_TYPE             {declarare_variabila_fara_init($1,$9,"NU");}
+        |ID '['NR']''['NR']'ASSIGN'/''/'matrix'/''/'
+        |type ID ASSIGN NR                                  {declarare_variabila($2, $1, $4,"DA");}
         |ID ID
         |ID'.'ID'('')'
         |ID'.'ID ASSIGN op
 
          ;
        
-vector:op
-      |vector',' op
-      ;
+array:op
+     |array',' op
+     ;
     
-matrice:matrice',''(' elemente_matrice')'
-       |'('elemente_matrice')'
+matrix:matrix',''(' matrix_elements')'
+       |'('matrix_elements')'
        ;       
 
-elemente_matrice:elemente_matrice','op
+matrix_elements:matrix_elements','op
                 |op
                 ;
 
@@ -578,34 +583,38 @@ expr:expr'+'expr            {$$ = $1 + $3;}
     |'('expr')'             {$$ =$2;}
     |NR                     {$$=$1;}
     |ID                     {identificare_variabila($1);verificare_initializare($1);$$=returnare_valoare($1);}
-    |functie_siruri         {$$=0;}
+    |string_function         {$$=0;}
     |ID'['op']'             {$$=0;}
     |ID'['op']''['op']'     {$$=0;}
     |'+'expr                {$$ =$$ + $2;}
     |'-'expr                {$$ =$$ - $2;}
     |'*'expr                {$$ =$$ * $2;}
     |':'expr                {$$ =$$ /$2;}
-    |apel_functie           {$$=1;}
+    |function_call           {$$=1;}
     |ID'.'ID                {$$=0;}
-    |ID'.'apel_functie      {$$=0;}
+    |ID'.'function_call      {$$=0;}
     |ID'.'ID'('')'          {$$=0;}
     |GHI ID GHI             {$$=0;}
     ;
 
-citire:READ elem_citire
+reading:READ elem_reading
       ;
 
-elem_citire:elem_citire',' ID
+elem_reading:elem_reading',' ID
            |ID
            ;      
 
-afisare:WRITE elem_afisare
+printing:WRITE elem_printing
       ;
 
-elem_afisare:elem_afisare',' ID         {identificare_variabila($3);}
+elem_printing:elem_printing',' ID         {identificare_variabila($3);}
            |ID                          {identificare_variabila($1);}
            ;
 %%
+
+int yywrap(void) {
+    return 1;
+}
 
 int yyerror(char * s){
 printf("eroare: %s la linia:%d\n",s,yylineno);

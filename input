@@ -1,31 +1,139 @@
-// main function
-// declarations
+#include<iostream>
+#include"math.h"
+#include"string.h"
 
-class Car {
-private
-    char brand[20];
-    char color;
-public
-    void setColor(char colorType) {
-        color = colorType;
-    }
-};
+class Persoana
+{
+    public:  int varsta<-20
+             inaltime<-int
+             inaltime <- 171
+             const int cnp<-1234
+                      
+    private: status<-char   
 
-int i;
-double val = 2.5, res[10];
-// statements
-for(i = 0; i < 10; i++){
-    res[i] = operation(val, i);
-    val = res[i]; 
-    print(res[i]);
-    print('\n');
+
+    int GetVarsta()
+    int GetInaltime()
+
+    void fisaMedicala()
+    {
+       varstaFisaMedicala<-int
+       inaltimeFisaMedicala<-int
+
+       varstaFisaMedicala<-varsta
+    }            
 }
-return;
-// functions
-double operation (double value, int i){    /* function declaration */
-    // declarations
-    double res;
-    // statements
-    res = value*i + i;
-    return res;
+
+int Persoana::GetVarsta()
+{
+  return varsta
+}
+
+int Persoana::GetInaltime()
+{
+  return inaltime
+}
+
+int max( x<-int,y<-int)
+{ 
+  x<-100
+  y<-200
+
+  if(x<y)  {return y} /*if*/
+       else  { return x} /*else*/
+
+ 
+}
+
+void afisare()
+{
+   i<-int
+   for(i<-1;i<=9;i++)
+    { write i}
+   
+}
+
+cuv<-char
+nrFloat<-float
+int aux<-10
+
+
+int main()
+{ 
+  vect[7]<-int
+  vect[7]<-//1,2,3,4,5,6,7//
+
+  ch<-char
+  ch<-"nepotrivire"
+
+  mat[2][4]<-float
+  mat[2][4]<-//(1,2,3,4),(2,4,6,8)//
+
+  Persoana Andrei
+  Persoana Lavinia
+
+   if(Andrei.varsta == 20)
+    { Andrei.GetVarsta()
+      if(Andrei.GetInaltime() != 171 )  { write ch }
+
+     }
+
+  int  a<-7
+  b<-int
+  b<-4  
+  c<-float 
+  c<-20
+  ccc<-double
+  bb1<-bool
+  bb1<-0
+
+
+  a<-max(vect,b)
+
+  continutFisier<-char
+  continutFisier<-"symbol"
+
+    if(max(b,a)+5+2<a || a<b && (a>=length(ch)) || x!=3*7+aux+4:(2*length(ch)+8) && !(a<b) || (length(a)==7) && (cmp(a,b)==0) || (length(ch)!=length(aux)) && ( x< max(a,b)+4-vect[7]+mat[3][4]) )
+    {
+        read continutFisier
+    }
+float fl1<-3
+while(a<2) 
+ {  d<-const int
+    
+    Eval(fl1)
+    Eval(fl1 + a + Andrei.GetVarsta() : (2+3) - "mara" : max(vect,b))
+
+    if(b==2)
+    {
+      a<-2+3
+      Eval(a)
+    }
+
+    else
+      { 
+        aux1<-int
+        aux1[5]<-//2,4,6,7,8//
+
+        for(i<-1;i<=9;i++){b<-i+2
+                                   if((c==4)&&(a!=length(a))||(cmp(a,b)==cmp(c,d)))
+                                             { int n<-2
+                                               k<-int
+
+                                              for( k<-1;k>=2*n;k++){
+                                                a<-b
+                                                k++
+                                                Eval(k)
+                                                k++
+                                               
+                                              }
+
+                                             }
+                                   }
+      }
+      Eval(a)
+      Eval(b)
+
+   Eval(a*b+continutFisier*k :2 + a*k:2 + "caractere"+length(ch):max(a,b) )   
+ }
 }

@@ -1,0 +1,51 @@
+
+ In 'clasa' se pot regasi urmatoarele declaratii de variabile:
+NUME: 'varsta' ,TIP:'int' , VALOARE: '20' ,CONSTANTA: 'NU' 
+NUME: 'inaltime' ,TIP:'int' , VALOARE: '171' ,CONSTANTA: 'NU' 
+NUME: 'cnp' ,TIP:'const int' , VALOARE: '1234' ,CONSTANTA: 'DA' 
+NUME: 'status' ,TIP:'char' , VALOARE: '0' ,CONSTANTA: 'NU' 
+
+ In 'in interiorul unei functii' se pot regasi urmatoarele declaratii de variabile:
+NUME: 'varstaFisaMedicala' ,TIP:'int' , VALOARE: '20' ,CONSTANTA: 'NU' 
+NUME: 'inaltimeFisaMedicala' ,TIP:'int' , VALOARE: '0' ,CONSTANTA: 'NU' 
+
+ In 'metode clasa' se pot regasi urmatoarele functii:
+NUME: 'GetVarsta' ,TIP:'int'  ,Parametrii: (null) 
+NUME: 'GetInaltime' ,TIP:'int'  ,Parametrii: (null) 
+NUME: 'fisaMedicala' ,TIP:'void'  ,Parametrii: (null) 
+
+ In 'in interiorul unei functii' se pot regasi urmatoarele declaratii de variabile:
+NUME: 'x' ,TIP:'int' , VALOARE: '100' ,CONSTANTA: 'NU' 
+NUME: 'y' ,TIP:'int' , VALOARE: '200' ,CONSTANTA: 'NU' 
+
+ In 'in interiorul unei functii' se pot regasi urmatoarele declaratii de variabile:
+NUME: 'i' ,TIP:'int' , VALOARE: '10' ,CONSTANTA: 'NU' 
+
+ In 'global' se pot regasi urmatoarele functii:
+NUME: 'max' ,TIP:'int'  ,Parametrii: int;int; 
+NUME: 'afisare' ,TIP:'void'  ,Parametrii: (null) 
+
+ In 'global' se pot regasi urmatoarele declaratii de variabile:
+NUME: 'cuv' ,TIP:'char' , VALOARE: '0' ,CONSTANTA: 'NU' 
+
+ In 'global' se pot regasi urmatoarele declaratii de variabile:
+NUME: 'nrFloat' ,TIP:'float' , VALOARE: '0' ,CONSTANTA: 'NU' 
+
+ In 'global' se pot regasi urmatoarele declaratii de variabile:
+NUME: 'aux' ,TIP:'int' , VALOARE: '10' ,CONSTANTA: 'NU' 
+
+ In 'main' se pot regasi urmatoarele declaratii de variabile:
+NUME: 'vect' ,TIP:'int' , VALOARE: '0' ,CONSTANTA: 'NU' 
+NUME: 'ch' ,TIP:'char' , VALOARE: '0' ,CONSTANTA: 'NU' 
+NUME: 'mat' ,TIP:'float' , VALOARE: '0' ,CONSTANTA: 'NU' 
+NUME: 'a' ,TIP:'int' , VALOARE: '12' ,CONSTANTA: 'NU' 
+NUME: 'b' ,TIP:'int' , VALOARE: '12' ,CONSTANTA: 'NU' 
+NUME: 'c' ,TIP:'float' , VALOARE: '0' ,CONSTANTA: 'NU' 
+NUME: 'ccc' ,TIP:'double' , VALOARE: '0' ,CONSTANTA: 'NU' 
+NUME: 'bb1' ,TIP:'bool' , VALOARE: '0' ,CONSTANTA: 'NU' 
+NUME: 'continutFisier' ,TIP:'char' , VALOARE: '0' ,CONSTANTA: 'NU' 
+NUME: 'fl1' ,TIP:'float' , VALOARE: '3' ,CONSTANTA: 'NU' 
+NUME: 'd' ,TIP:'const int' , VALOARE: '0' ,CONSTANTA: 'DA' 
+NUME: 'aux1' ,TIP:'int' , VALOARE: '0' ,CONSTANTA: 'NU' 
+NUME: 'n' ,TIP:'int' , VALOARE: '2' ,CONSTANTA: 'NU' 
+NUME: 'k' ,TIP:'int' , VALOARE: '7' ,CONSTANTA: 'NU' 
