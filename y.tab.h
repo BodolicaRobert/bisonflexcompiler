@@ -1,4 +1,4 @@
-/* A Bison parser, made by GNU Bison 3.7.3.  */
+/* A Bison parser, made by GNU Bison 3.5.1.  */
 
 /* Bison interface for Yacc-like parsers in C
 
@@ -31,9 +31,8 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
-   especially those whose name start with YY_ or yy_.  They are
-   private implementation details that can be changed or removed.  */
+/* Undocumented macros, especially those whose name start with YY_,
+   are private implementation details.  Do not rely on them.  */
 
 #ifndef YY_YY_Y_TAB_H_INCLUDED
 # define YY_YY_Y_TAB_H_INCLUDED
@@ -45,75 +44,67 @@
 extern int yydebug;
 #endif
 
-/* Token kinds.  */
+/* Token type.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
   enum yytokentype
   {
-    YYEMPTY = -2,
-    YYEOF = 0,                     /* "end of file"  */
-    YYerror = 256,                 /* error  */
-    YYUNDEF = 257,                 /* "invalid token"  */
-    KEYWORD_IF = 258,              /* KEYWORD_IF  */
-    KEYWORD_WHILE = 259,           /* KEYWORD_WHILE  */
-    KEYWORD_ELSE = 260,            /* KEYWORD_ELSE  */
-    KEYWORD_FOR = 261,             /* KEYWORD_FOR  */
-    AND = 262,                     /* AND  */
-    OR = 263,                      /* OR  */
-    ASSIGN = 264,                  /* ASSIGN  */
-    KEYWORD_CLASS = 265,           /* KEYWORD_CLASS  */
-    MAIN = 266,                    /* MAIN  */
-    GHI = 267,                     /* GHI  */
-    LIBRARY = 268,                 /* LIBRARY  */
-    EQUAL = 269,                   /* EQUAL  */
-    KEYWORD_INCLUDE = 270,         /* KEYWORD_INCLUDE  */
-    KEYWORD_RETURN = 271,          /* KEYWORD_RETURN  */
-    READ = 272,                    /* READ  */
-    WRITE = 273,                   /* WRITE  */
-    NR = 274,                      /* NR  */
-    ID = 275,                      /* ID  */
-    KEYWORD_TYPE = 276,            /* KEYWORD_TYPE  */
-    KEYWORD_CLASS_TYPE = 277,      /* KEYWORD_CLASS_TYPE  */
-    KEYWORD_CONST = 278,           /* KEYWORD_CONST  */
-    INC = 279,                     /* INC  */
-    DEC = 280,                     /* DEC  */
-    STRCAT = 281,                  /* STRCAT  */
-    STRSTR = 282,                  /* STRSTR  */
-    STRCHR = 283,                  /* STRCHR  */
-    STRCMP = 284,                  /* STRCMP  */
-    STRLEN = 285,                  /* STRLEN  */
-    STRCPY = 286,                  /* STRCPY  */
-    EVAL = 287                     /* EVAL  */
+    INC = 258,
+    DEC = 259,
+    OR = 260,
+    AND = 261,
+    ASSIGN = 262,
+    KEYWORD_IF = 263,
+    KEYWORD_WHILE = 264,
+    KEYWORD_ELSE = 265,
+    KEYWORD_FOR = 266,
+    KEYWORD_CLASS = 267,
+    MAIN = 268,
+    GHI = 269,
+    LIBRARY = 270,
+    EQUAL = 271,
+    KEYWORD_INCLUDE = 272,
+    KEYWORD_RETURN = 273,
+    READ = 274,
+    WRITE = 275,
+    NR = 276,
+    ID = 277,
+    KEYWORD_TYPE = 278,
+    KEYWORD_CLASS_TYPE = 279,
+    KEYWORD_CONST = 280,
+    STRCAT = 281,
+    STRSTR = 282,
+    STRCHR = 283,
+    STRCMP = 284,
+    STRLEN = 285,
+    STRCPY = 286,
+    EVAL = 287
   };
-  typedef enum yytokentype yytoken_kind_t;
 #endif
-/* Token kinds.  */
-#define YYEOF 0
-#define YYerror 256
-#define YYUNDEF 257
-#define KEYWORD_IF 258
-#define KEYWORD_WHILE 259
-#define KEYWORD_ELSE 260
-#define KEYWORD_FOR 261
-#define AND 262
-#define OR 263
-#define ASSIGN 264
-#define KEYWORD_CLASS 265
-#define MAIN 266
-#define GHI 267
-#define LIBRARY 268
-#define EQUAL 269
-#define KEYWORD_INCLUDE 270
-#define KEYWORD_RETURN 271
-#define READ 272
-#define WRITE 273
-#define NR 274
-#define ID 275
-#define KEYWORD_TYPE 276
-#define KEYWORD_CLASS_TYPE 277
-#define KEYWORD_CONST 278
-#define INC 279
-#define DEC 280
+/* Tokens.  */
+#define INC 258
+#define DEC 259
+#define OR 260
+#define AND 261
+#define ASSIGN 262
+#define KEYWORD_IF 263
+#define KEYWORD_WHILE 264
+#define KEYWORD_ELSE 265
+#define KEYWORD_FOR 266
+#define KEYWORD_CLASS 267
+#define MAIN 268
+#define GHI 269
+#define LIBRARY 270
+#define EQUAL 271
+#define KEYWORD_INCLUDE 272
+#define KEYWORD_RETURN 273
+#define READ 274
+#define WRITE 275
+#define NR 276
+#define ID 277
+#define KEYWORD_TYPE 278
+#define KEYWORD_CLASS_TYPE 279
+#define KEYWORD_CONST 280
 #define STRCAT 281
 #define STRSTR 282
 #define STRCHR 283
@@ -126,12 +117,12 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 28 "lexer.y"
+#line 290 "lexer.y"
 
       int nr;
       char* str;
 
-#line 135 "y.tab.h"
+#line 126 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

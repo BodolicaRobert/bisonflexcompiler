@@ -7,7 +7,7 @@ extern FILE* yyin;
 extern char* yytext;
 extern int yylineno;
 extern int yylex();
-extern int yyerror(char* syntaxerror);
+extern int yyerror(char * syntaxerror);
 
 
 int var_counter=0,new_var_counter=0;
@@ -127,11 +127,14 @@ void Assign(char* name,int value)
         if(strcmp(var[verify_if_declared(name)].data_type,"int")==0 && value != 0)                                                                            
         {var[verify_if_declared(name)].value=value;
         var[verify_if_declared(name)].initialization=strdup("YES");  }
-        else if(strcmp(var[verify_if_declared(name)].data_type,"float")==0 && value != 0)
+        else 
+         if(strcmp(var[verify_if_declared(name)].data_type,"float")==0 && value != 0)
           {var[verify_if_declared(name)].initialization=strdup("YES");  }
-        else if(strcmp(var[verify_if_declared(name)].data_type,"double")==0 && value != 0)
+        else 
+         if(strcmp(var[verify_if_declared(name)].data_type,"double")==0 && value != 0)
           {var[verify_if_declared(name)].initialization=strdup("YES");  }
-        else if(strcmp(var[verify_if_declared(name)].data_type,"bool")==0 && ( value == 0 || value==1))
+        else 
+         if(strcmp(var[verify_if_declared(name)].data_type,"bool")==0 && ( value == 0 || value==1))
           {var[verify_if_declared(name)].initialization=strdup("YES");}
         else
         if(strcmp(var[verify_if_declared(name)].data_type,"char")==0 && value == 0)
@@ -292,7 +295,7 @@ void decr(char * name)
 %token<nr> NR 
 %token<str> ID KEYWORD_TYPE KEYWORD_CLASS_TYPE KEYWORD_CONST INC DEC STRCAT STRSTR STRCHR STRCMP STRLEN STRCPY EVAL 
 %type<nr> expr
-%type<str> type class_method function_parameter function_parameters ids
+%type<str> type function_parameter function_parameters ids
 %%
 start:libraries classes global KEYWORD_TYPE MAIN '{' program '}' {printf("The program is accepted\n");}
      ;
@@ -441,17 +444,17 @@ logic_operator:AND
               |'!'
               ;   
 
-content:KEYWORD_TYPE ID ASSIGN NR';'cond';'ID INC               {var_declaring($2,$1,$4,"NOPE");var_verification($2);}
-        |KEYWORD_TYPE ID ASSIGN NR';'cond';'ID DEC              {var_declaring($2,$1,$4,"NOPE");var_verification($2);}
-        |ID ASSIGN NR ';'cond';'ID DEC                          {var_verification($1);var_verification($7);}
-        |ID ASSIGN NR ';'cond';'ID INC                          {var_verification($1);var_verification($7);}
+content:KEYWORD_TYPE ID ASSIGN NR';'cond';'ID INC               {var_declaring($2,$1,$4,"NOPE");var_verification($2);incr($1);}
+        |KEYWORD_TYPE ID ASSIGN NR';'cond';'ID DEC              {var_declaring($2,$1,$4,"NOPE");var_verification($2);decr($1);}
+        |ID ASSIGN NR ';'cond';'ID DEC                          {var_verification($1);var_verification($7);Assign($1,$3);decr($1);}
+        |ID ASSIGN NR ';'cond';'ID INC                          {var_verification($1);var_verification($7);Assign($1,$3);incr($1);}
         ;
 
-cond:   ID '>''=' expr                              {var_verification($1);Assign($1,$4 + 1); }
-        |ID '<''=' expr                             {var_verification($1);Assign($1,$4 + 1);} 
-        |ID '!''=' expr                             {var_verification($1);Assign($1, $4);} 
-        |ID'<'expr                                  {var_verification($1);Assign($1,$3);} 
-        |ID'>'expr                                  {var_verification($1);Assign($1,$3);} 
+cond:   ID '>''=' expr                              {var_verification($1); }
+        |ID '<''=' expr                             {var_verification($1); }  
+        |ID '!''=' expr                             {var_verification($1); } 
+        |ID'<'expr                                  {var_verification($1); } 
+        |ID'>'expr                                  {var_verification($1); } 
         ;                            
 
 instructions:instructions instruction
@@ -536,12 +539,8 @@ elem_printing:elem_printing',' ID         {var_verification($3);}
            ;
 %%
 
-int yywrap(void) {
-    return 1;
-}
-
 int yyerror(char * s){
-printf("erorr: %s at line:%d\n",s,yylineno);
+printf("error: %s at line:%d\n",s,yylineno);
 }
 
 int main(int argc, char** argv){
