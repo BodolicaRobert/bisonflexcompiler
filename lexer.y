@@ -481,9 +481,9 @@ expression:ID ASSIGN expr                                   {var_verification($1
         |ID ASSIGN type                                     {var_declaring_without_init($1, $3, "YES");} 
         |KEYWORD_TYPE ID ASSIGN NR                          {var_declaring($2, $1, $4, "NOPE");}
         |ID '['NR']'ASSIGN KEYWORD_TYPE                     {var_declaring_without_init($1,$6,"NOPE");}
-        |ID '['NR']'ASSIGN'/''/'array'/''/'                 {var_verification($1);}
+        |ID '['NR']'ASSIGN'{'array'}'                 {var_verification($1);}
         |ID '['NR']''['NR']'ASSIGN KEYWORD_TYPE             {var_declaring_without_init($1,$9,"NOPE");}
-        |ID '['NR']''['NR']'ASSIGN'/''/'matrix'/''/'
+        |ID '['NR']''['NR']'ASSIGN'{'matrix'}'
         |type ID ASSIGN NR                                  {var_declaring($2, $1, $4,"YES");}
         |ID ID
         |ID'.'ID'('')'
@@ -510,16 +510,16 @@ expr:expr'+'expr            {$$ = $1 + $3;}
     |'('expr')'             {$$ =$2;}
     |NR                     {$$=$1;}
     |ID                     {var_verification($1);initialization_verify($1);$$=return_value($1);}
-    |string_function         {$$=0;}
+    |string_function        {$$=0;}
     |ID'['op']'             {$$=0;}
     |ID'['op']''['op']'     {$$=0;}
     |'+'expr                {$$ =$$ + $2;}
     |'-'expr                {$$ =$$ - $2;}
     |'*'expr                {$$ =$$ * $2;}
     |':'expr                {$$ =$$ /$2;}
-    |function_call           {$$=1;}
+    |function_call          {$$=1;}
     |ID'.'ID                {$$=0;}
-    |ID'.'function_call      {$$=0;}
+    |ID'.'function_call     {$$=0;}
     |ID'.'ID'('')'          {$$=0;}
     |GHI ID GHI             {$$=0;}
     ;

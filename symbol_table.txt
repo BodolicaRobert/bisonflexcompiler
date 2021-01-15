@@ -1,52 +1,43 @@
 
  Variable statements In 'Class':
-name: 'varsta' ,type:'int' , value: '20' ,constant 'NOPE' 
-name: 'inaltime' ,type:'int' , value: '171' ,constant 'NOPE' 
-name: 'cnp' ,type:'const int' , value: '1234' ,constant 'YES' 
+name: 'productionYear' ,type:'int' , value: '2012' ,constant 'NOPE' 
+name: 'price' ,type:'int' , value: '40000' ,constant 'NOPE' 
+name: 'brand' ,type:'char' , value: '0' ,constant 'NOPE' 
 name: 'status' ,type:'char' , value: '0' ,constant 'NOPE' 
 
  Variable statements In 'the function':
-name: 'varstaFisaMedicala' ,type:'int' , value: '20' ,constant 'NOPE' 
-name: 'inaltimeFisaMedicala' ,type:'int' , value: '0' ,constant 'NOPE' 
+name: 'newPrice' ,type:'int' , value: '10' ,constant 'NOPE' 
 
  Functions in 'Class Methods':
-name: 'GetVarsta' ,type:'int'  ,parameters: (null) 
-name: 'GetInaltime' ,type:'int'  ,parameters: (null) 
-name: 'fisaMedicala' ,type:'void'  ,parameters: (null) 
+name: 'GetPrice' ,type:'int'  ,parameters: (null) 
+name: 'GetBrand' ,type:'char'  ,parameters: (null) 
+name: 'SetPrice' ,type:'void'  ,parameters: int; 
 
  Variable statements In 'the function':
-name: 'x' ,type:'int' , value: '100' ,constant 'NOPE' 
-name: 'y' ,type:'int' , value: '200' ,constant 'NOPE' 
-
- Variable statements In 'the function':
-name: 'i' ,type:'int' , value: '2' ,constant 'NOPE' 
-
- Functions in 'global':
-name: 'max' ,type:'int'  ,parameters: int;int; 
-name: 'afisare' ,type:'void'  ,parameters: (null) 
+name: 'a' ,type:'int' , value: '10' ,constant 'NOPE' 
+name: 'b' ,type:'int' , value: '20' ,constant 'NOPE' 
 
  Variable statements In 'global':
-name: 'cuv' ,type:'char' , value: '0' ,constant 'NOPE' 
+name: 'counter' ,type:'int' , value: '10' ,constant 'NOPE' 
 
  Variable statements In 'global':
-name: 'nrFloat' ,type:'float' , value: '0' ,constant 'NOPE' 
+name: 'f' ,type:'float' , value: '0' ,constant 'NOPE' 
 
  Variable statements In 'global':
-name: 'aux' ,type:'int' , value: '10' ,constant 'NOPE' 
+name: 'myChr' ,type:'char' , value: '0' ,constant 'NOPE' 
 
  Variable statements In 'main':
 name: 'vect' ,type:'int' , value: '0' ,constant 'NOPE' 
-name: 'ch' ,type:'char' , value: '0' ,constant 'NOPE' 
+name: 'priceTag' ,type:'char' , value: '0' ,constant 'NOPE' 
 name: 'mat' ,type:'float' , value: '0' ,constant 'NOPE' 
-name: 'a' ,type:'int' , value: '5' ,constant 'NOPE' 
-name: 'b' ,type:'int' , value: '5' ,constant 'NOPE' 
-name: 'c' ,type:'float' , value: '0' ,constant 'NOPE' 
-name: 'ccc' ,type:'double' , value: '0' ,constant 'NOPE' 
-name: 'bb1' ,type:'bool' , value: '0' ,constant 'NOPE' 
+name: 'myInt' ,type:'int' , value: '5' ,constant 'NOPE' 
+name: 'myInt2' ,type:'int' , value: '4' ,constant 'NOPE' 
+name: 'myFloat' ,type:'float' , value: '0' ,constant 'NOPE' 
+name: 'myDouble' ,type:'double' , value: '0' ,constant 'NOPE' 
+name: 'myBool' ,type:'bool' , value: '0' ,constant 'NOPE' 
 name: 'ex' ,type:'int' , value: '25' ,constant 'NOPE' 
-name: 'continutFisier' ,type:'char' , value: '0' ,constant 'NOPE' 
-name: 'fl1' ,type:'float' , value: '3' ,constant 'NOPE' 
-name: 'd' ,type:'const int' , value: '0' ,constant 'YES' 
-name: 'aux1' ,type:'int' , value: '0' ,constant 'NOPE' 
+name: 'fileContent' ,type:'char' , value: '0' ,constant 'NOPE' 
+name: 'myConstInt' ,type:'const int' , value: '0' ,constant 'YES' 
+name: 'i' ,type:'int' , value: '2' ,constant 'NOPE' 
 name: 'n' ,type:'int' , value: '2' ,constant 'NOPE' 
-name: 'k' ,type:'int' , value: '3' ,constant 'NOPE' 
+name: 'k' ,type:'int' , value: '5' ,constant 'NOPE' 

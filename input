@@ -2,141 +2,120 @@
 #include"math.h"
 #include"string.h"
 
-class Persoana
+class Car
 {
-    public:  int varsta<-20
-             inaltime<-int
-             inaltime <- 171
-             const int cnp<-1234
+    public:  int productionYear<-2012
+             price<-int
+             price<-40000
+             brand<-char
                       
     private: status<-char   
 
 
-    int GetVarsta()
-    int GetInaltime()
+    int GetPrice()
+    char GetBrand()
 
-    void fisaMedicala()
+    void SetPrice(newPrice<-int)
     {
-       varstaFisaMedicala<-int
-       inaltimeFisaMedicala<-int
-
-       varstaFisaMedicala<-varsta
+       newPrice<-10
+       price<-newPrice
     }            
 }
 
-int Persoana::GetVarsta()
+int Car::GetPrice()
 {
-  return varsta
+  return price
 }
 
-int Persoana::GetInaltime()
+char Car::GetBrand()
 {
-  return inaltime
+  return brand
 }
 
-int max( x<-int,y<-int)
+int min( a<-int,b<-int)
 { 
-  x<-100
-  y<-200
-
-  if(x<y)  {return y} /*if*/
-       else  { return x} /*else*/
-
- 
+  a<-10
+  b<-20
+  if(a<b)  {return a}
+       else  { return b} 
 }
 
-void afisare()
-{
-   i<-int
-   for(i<-1;i<=9;i++)
-    { write i}
-   
-}
-
-cuv<-char
-nrFloat<-float
-int aux<-10
+int counter<-10
+f<-float
+myChr<-char
 
 
 int main()
 { 
   vect[7]<-int
-  vect[7]<-//1,2,3,4,5,6,7//
+  vect[7]<-{1,2,3,4,5,6,7}
   
-  ch<-char
-  ch<-"nepotrivire"
+  priceTag<-char
+  priceTag<-"expensive"
 
   mat[2][4]<-float
-  mat[2][4]<-//(1,2,3,4),(2,4,6,8)//
+  mat[2][4]<-{(1,2,3,4),(2,4,6,8)}
 
-  Persoana Andrei
-  Persoana Lavinia
+  Car c1
+  Car c2
 
-   if(Andrei.varsta == 20)
-    { Andrei.GetVarsta()
-      if(Andrei.GetInaltime() != 171 )  { write ch }
+   if(c1.productionYear == 2012)
+    { 
+      c1.Getprice()
+      write priceTag
+    }
 
-     }
-
-  int  a<-7
-  b<-int
-  b<-4  
-  c<-float 
-  c<-20
-  ccc<-double
-  bb1<-bool
-  bb1<-0
+  int  myInt<-7
+  myInt2<-int
+  myInt2<-4  
+  myFloat<-float 
+  myFloat<-20
+  myDouble<-double
+  myBool<-bool
+  myBool<-0
   ex<-int
   ex<-25
 
 
-  a<-max(vect,b)
+  fileContent<-char
+  fileContent<-"symbol"
 
-  continutFisier<-char
-  continutFisier<-"symbol"
-
-    if(max(b,a)+5+2<a || a<b && (a>=length(ch)) || x!=3*7+aux+4:(2*length(ch)+8) && !(a<b) || (length(a)==7) && (cmp(a,b)==0) || (length(ch)!=length(aux)) && ( x< max(a,b)+4-vect[7]+mat[3][4]) )
+    if(min(myInt,myInt2)+5+2<myInt || (length(priceTag)!=3*7+counter+4:(2*8)) && !(myInt<myInt2))
     {
-        read continutFisier
+        read fileContent
     }
-float fl1<-3
-Eval(max(ex,b))
-while(a<2) 
- {  d<-const int
-    
-    Eval(fl1)
-    Eval(fl1 + a + Andrei.GetVarsta() : (2+3) - max(vect,b))
 
-    if(b==2)
+Eval(min(ex,myInt2))
+while(myInt<2) 
+ {  myConstInt<-const int
+    
+    Eval(myFloat)
+    Eval(myFloat + myInt + c2.GetPrice() : (2+3))
+
+    if(myInt2==2)
     {
-      a<-2+3
-      Eval(a)
+      myInt<-2+3
+      Eval(myInt)
     }
 
     else
       { 
-        aux1<-int
-        aux1[5]<-//2,4,6,7,8//
-        
-        for( i<-1;i<9;i++)
-        {     b<-i+3
-              if((c==4)&&(a!=length(a))||(cmp(a,b)==cmp(c,d)))
-               { int n<-2
+        i<-int
+        for(i<-1;i<9;i++)
+        {     myInt<-i+3
+              if((myFloat==4)&&(myInt!=length(priceTag))||(cmp(myInt,myInt2)==cmp(myFloat,myDouble)))
+               { 
+                 int n<-2
                  k<-int
-
-                 for( k<-1;k>=2*n;k++)
-                 {
-                  a<-b
-                  k++
-                  Eval(k)                              
-                 }
-
+                 k<-n*2
+                 k++
+                 Eval(k)
                 }
         }
       }
-      Eval(a)
-      Eval(b)
+      Eval(myInt)
+      Eval(myInt2)
 
-   Eval(a*b+continutFisier*k :2 + a*k:2 + "caractere"+length(ch):max(a,b) )   
+   Eval(myInt*myInt2+fileContent*k :2 + myInt*k:2 + "caractere"+length(priceTag):min(myInt,myInt) )   
  }
 }
